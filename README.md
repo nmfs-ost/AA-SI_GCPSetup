@@ -4,7 +4,7 @@ This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
 ---
 
-### 1. 💻 Copy & Run
+### 💻 Copy & Run
 
 The command below downloads the initialization script, sets permissions, runs it, activates the virtual environment, and starts Google Cloud authentication process👤🔐🌐:
 
@@ -23,7 +23,7 @@ Follow the browser-based instructions to authenticate using your NOAA Google acc
 
 ---
 
-### 2. 🐟 Explore Tools
+### 🐟 Explore Tools
 
 Run the following to see available operations:
 
