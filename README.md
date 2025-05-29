@@ -12,7 +12,7 @@ This quick guide walks you through setting up your GCP Workstation with AA-SI to
 The command below downloads the initialization script, sets permissions, runs it, activates the virtual environment, and starts Google Cloud authentication process🌐🔐:
 
 ```bash
-sudo wget https://raw.githubusercontent.com/spacetimeengineer/nmfs-ost/AA-SI_GPCSetup/main/init.sh && \
+sudo wget https://raw.githubusercontent.com/nmfs-ost/AA-SI_GPCSetup/main/init.sh && \
 sudo chmod +x init.sh && \
 ./init.sh && \
 cd ~ && \
