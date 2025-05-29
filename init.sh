@@ -53,7 +53,7 @@ fi
 echo "🔧 Setting up AA-SI environment..."
 cd "$HOME"
 
-ENV_NAME="aa_venv"
+ENV_NAME="aa_si"
 echo "🧪 Creating virtual environment: $ENV_NAME"
 python3.10 -m venv "$ENV_NAME"
 source "$ENV_NAME/bin/activate"
