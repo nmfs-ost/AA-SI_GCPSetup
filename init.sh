@@ -30,7 +30,7 @@ else
 fi
 
 # --- Check for Python 3.10 ---
-if command -v python3.10 &>/dev/null; then
+if python3.10 --version &>/dev/null; then
     echo "🐍 Python 3.10 is already installed. Skipping Python setup."
 else
     echo "🔧 Python 3.10 not found. Installing..."
