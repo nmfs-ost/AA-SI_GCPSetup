@@ -1,28 +1,46 @@
-# Instructions for including your repository in the nmfs-ost organization
+# Post-Build Setup Instructions
 
-## Collaborators
+This guide walks you through setting up your development environment after a build. It includes setting permissions, executing the `init.sh` script, activating the Python virtual environment, authenticating with Google Cloud, and running validation tests.
 
-If you have NMFS collaborators on your repository who are not members of the NMFS GitHub Enterprise Cloud (GHEC) account, have them complete the [OST GHEC Interest Form](https://docs.google.com/forms/d/1Zof3rWHYVxXy3FZJVPfN-He6Kl-GUUYoYNZUUXcr5xI/edit)). If they are not NOAA NMFS FTEs or Affiliates, [contact an administrator](https://github.com/nmfs-ost/admin?tab=readme-ov-file#administration-for-the-ost-organization) to help you add them to your repository or to transfer in your repository with outside collaborators.
+---
 
-## For repositories migrated to nmfs-ost organization
+## 🚀 Step-by-Step Instructions
 
-1) Update your `README.md` file to include the disclaimer and a license. See below for a description of licenses.
-2) Include an “about” statement in each repository to make it clear what the purpose of the repository is.
-3) Add [topics](https://docs.github.com/en/enterprise-cloud@latest/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics) to help users find repositories.
-4) [Add a license](https://docs.github.com/en/enterprise-cloud@latest/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository). **This is a MUST for public repositories.** If you are migrating a private repository, it is strongly advised to add a license but not required. Work written by For work  produced by U.S. government employees, we are required to use an [open source license](https://opensource.org/license). If contributors other than FTEs wrote code and the repository does not yet have an open source license, make sure all parties agree before applying an open source license. For data/documentation, use [CC0](https://creativecommons.org/public-domain/cc0/). For code, common choices include [Apache 2.0](https://opensource.org/license/apache-2-0) and [MIT](https://opensource.org/license/mit).
-5) For private or internal repositories, add the file [`.github/workflows/secretSCAN.yml`](https://github.com/nmfs-ost/ost-template/blob/main/.github/workflows/secretScan.yml). This is a GitHub action that will check for token and keys that are accidentally committed to a repository.
-6) For public repositories, the `secretSCAN.yml` file is not needed. Instead, check that [GitHub secret scanning is enabled for the repository](https://docs.github.com/en/enterprise-cloud@latest/code-security/secret-scanning/configuring-secret-scanning-for-your-repositories#enabling-secret-scanning-alerts-for-users).
 
-## For new repositories in nmfs-ost organization
+### 1. Download and Run Initialization Script -> Activate AA-SI enviornment -> Authenticate
 
-Create a repository from [this template](https://docs.github.com/en/enterprise-cloud@latest/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template#creating-a-repository-from-a-template) and follow the instructions below.
+```bash
+sudo wget https://raw.githubusercontent.com/spacetimeengineer/AA-SI_init/main/init.sh && \
+sudo chmod +x init.sh && \
+./init.sh && \
+cd ~ && \
+source aa_lab/bin/activate && \
+gcloud auth application-default login && \
+gcloud config set account {ACCOUNT} && \ 
+gcloud config set project ggn-nmfs-aa-dev-1 
+```
 
-1) Include an “about” statement in each repository to make it clear what the purpose of the repository is.
-2) Add [topics](https://docs.github.com/en/enterprise-cloud@latest/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/classifying-your-repository-with-topics) to help users find repositories.
-3) [Add a license](https://docs.github.com/en/enterprise-cloud@latest/communities/setting-up-your-project-for-healthy-contributions/adding-a-license-to-a-repository). **This is a MUST for public repositories.** If you are migrating a private repository, it is strongly advised to add a license but not required. Work written by For work  produced by U.S. government employees, we are required to use an [open source license](https://opensource.org/license). If contributors other than FTEs wrote code and the repository does not yet have an open source license, make sure all parties agree before applying an open source license. For data/documentation, use [CC0](https://creativecommons.org/public-domain/cc0/). For code, common choices include [Apache 2.0](https://opensource.org/license/apache-2-0) and [MIT](https://opensource.org/license/mit).
-4) For private or internal repositories, Confirm that the file `.github/workflows/secretSCAN.yml` is in this repository. This is a GitHub action that will check for token and keys that are accidentally committed to a repository.
-5) For public repositories, you may delete the file `.github/workflows/secretSCAN.yml`. This is because [GitHub secret scanning is used in Public Repositories](https://docs.github.com/en/enterprise-cloud@latest/code-security/secret-scanning/configuring-secret-scanning-for-your-repositories#enabling-secret-scanning-alerts-for-users).
-6) Once you have completed the steps, delete the instructions from this `README.md`.
+Follow the browser-based instructions to complete authentication.
+
+---
+
+### 2. Explore Available Commands
+
+Run the following to see available operations:
+
+```bash
+aa-help
+```
+
+This will list available tools, scripts, or modules you can run within the environment.
+
+---
+
+## ✅ You're Ready!
+
+You’ve completed the setup and verified that everything is working. You can now start using the tools provided in your environment.
+
+---
 
 # Disclaimer
 This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or Department of Commerce bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.
