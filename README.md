@@ -26,7 +26,7 @@ Follow the browser-based instructions to authenticate using your NOAA Google acc
 
 ---
 
-### 2. 🧭 Explore Tools
+### 2. 🐟 Explore Tools
 
 Run the following to see available operations:
 
