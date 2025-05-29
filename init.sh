@@ -10,7 +10,8 @@ sleep 0.1
 mkdir -p "$HOME"
 echo "🛠️ Base station ($HOME) is operational."
 sleep 0.4
-
+sudo apt update
+sudo apt upgrade -y
 # --- Copy files from /opt to $HOME if /opt is not empty ---
 if [ -d /opt ] && [ "$(ls -A /opt)" ]; then
     echo "📦 /opt sonar payload detected. Transferring to base station..."
