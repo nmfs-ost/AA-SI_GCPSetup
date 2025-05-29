@@ -4,7 +4,7 @@ This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
 ---
 
-## 🚀 Step-by-Step Instructions
+## 📘 Instructions
 
 
 ### 1. 💻 Copy & Run
@@ -35,12 +35,6 @@ aa-help
 ```
 
 This will list available tools, scripts, or modules you can run within the environment.
-
----
-
-## ✅ Setup Complete
-
-You’ve completed the setup and verified that everything is working. You can now start using the tools provided in your environment.
 
 ---
 
