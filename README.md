@@ -1,11 +1,8 @@
-# 🛠️ GCP Workstation Setup
+# 📘 GCP Workstation Setup Instructions
 
 This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
 ---
-
-## 📘 Instructions
-
 
 ### 1. 💻 Copy & Run
 
