@@ -1,4 +1,4 @@
-# 📘 GCP Workstation Setup Instructions
+# 📘 GCP Workstation : AA-SI Setup Instructions
 
 This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
