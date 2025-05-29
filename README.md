@@ -6,7 +6,7 @@ This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
 ### 1. 💻 Copy & Run
 
-The command below downloads the initialization script, sets permissions, runs it, activates the virtual environment, and starts Google Cloud authentication process🌐🔐:
+The command below downloads the initialization script, sets permissions, runs it, activates the virtual environment, and starts Google Cloud authentication process👤🔐🌐:
 
 ```bash
 sudo wget https://raw.githubusercontent.com/nmfs-ost/AA-SI_GPCSetup/main/init.sh && \
