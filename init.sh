@@ -52,15 +52,15 @@ fi
 echo "🔧 Setting up AA-SI environment..."
 cd "$HOME"
 
-ENV_NAME="aa_lab"
-echo "🧪 Creating virtual test tank: $ENV_NAME"
+ENV_NAME="aa_venv"
+echo "🧪 Creating virtual environment: $ENV_NAME"
 python3.10 -m venv "$ENV_NAME"
 source "$ENV_NAME/bin/activate"
 
 pip install --upgrade pip
 
 # Install acoustic processing packages
-echo "🐬 Installing acoustics libraries into $ENV_NAME..."
+echo "🐬 Installing acoustics tools into $ENV_NAME..."
 
 echo "🎣 Installing AA-SI_aalibrary (active signal interpretation)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_aalibrary
