@@ -1,13 +1,15 @@
-# Post-Build Setup Instructions
+# 🛠️ GCP Workstation Setup
 
-This guide walks you through setting up your development environment after a build. It includes setting permissions, executing the `init.sh` script, activating the Python virtual environment, authenticating with Google Cloud, and running validation tests.
+This quick guide walks you through setting up your GCP Workstation with AA-SI tools.
 
 ---
 
 ## 🚀 Step-by-Step Instructions
 
 
-### 1. Download and Run Initialization Script -> Activate AA-SI enviornment -> Authenticate
+### 1. 💻 Copy & Run
+
+The command below downloads the initialization script, sets permissions, runs it, activates the virtual environment, and starts Google Cloud authentication process🌐🔐:
 
 ```bash
 sudo wget https://raw.githubusercontent.com/spacetimeengineer/AA-SI_init/main/init.sh && \
@@ -20,11 +22,11 @@ gcloud config set account {ACCOUNT} && \
 gcloud config set project ggn-nmfs-aa-dev-1 
 ```
 
-Follow the browser-based instructions to complete authentication.
+Follow the browser-based instructions to authenticate using your NOAA Google account.
 
 ---
 
-### 2. Explore Available Commands
+### 2. 🧭 Explore Tools
 
 Run the following to see available operations:
 
@@ -36,11 +38,11 @@ This will list available tools, scripts, or modules you can run within the envir
 
 ---
 
-## ✅ You're Ready!
+## ✅ Setup Complete
 
 You’ve completed the setup and verified that everything is working. You can now start using the tools provided in your environment.
 
 ---
 
-# Disclaimer
+# 📜 Disclaimer
 This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or Department of Commerce bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.
