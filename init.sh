@@ -24,25 +24,13 @@ else
     echo "🛑 /opt empty — no acoustic data to transfer."
 fi
 
-# --- Check for Python 3.10 ---
-if python3.10 --version &>/dev/null; then
-    echo "🐍 Python 3.10 is already installed. Skipping Python setup."
-else
-    echo "🔧 Python 3.10 not found. Installing..."
-    sudo apt update
-    sudo apt install -y software-properties-common
-    sudo add-apt-repository -y ppa:deadsnakes/ppa
-    sudo apt update
-    sudo apt install -y python3.10 python3.10-dev
-fi
-
-# --- Check if python3.10-venv is installed ---
-if python3.10 -m venv --help &>/dev/null; then
-    echo "🧪 python3.10-venv is already available. Skipping venv package install."
-else
-    echo "🔧 Installing python3.10-venv..."
-    sudo apt install -y python3.10-venv
-fi
+# --- Install Python 3.10 and venv unconditionally ---
+echo "🔧 Installing Python 3.10 and venv tools..."
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install -y python3.10 python3.10-dev python3.10-venv
 
 # --- Set up Python virtual environment and install packages ---
 echo "🔧 Setting up AA-SI environment..."
