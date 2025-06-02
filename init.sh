@@ -2,20 +2,17 @@
 set -e  # Exit immediately if any command fails
 
 echo "🔊🐟 Initializing..."
-sleep 0.1
 
 # --- Ensure the home directory exists ---
 echo "🏚️ Preparing workstation setup at $HOME..."
-sleep 0.1
 mkdir -p "$HOME"
 echo "🛠️ Base station ($HOME) is operational."
-sleep 0.4
 sudo apt update
 sudo apt upgrade -y
+
 # --- Copy files from /opt to $HOME if /opt is not empty ---
 if [ -d /opt ] && [ "$(ls -A /opt)" ]; then
     echo "📦 /opt sonar payload detected. Transferring to base station..."
-    sleep 0.1
 
     shopt -s dotglob  # Include hidden files (like camouflaged cephalopods 🦑)
     # cp -r /opt/aa-scripts "$HOME"/
@@ -23,10 +20,8 @@ if [ -d /opt ] && [ "$(ls -A /opt)" ]; then
     shopt -u dotglob
 
     echo "🎯 Payload deployed to $HOME — assets ready."
-    sleep 0.4
 else
     echo "🛑 /opt empty — no acoustic data to transfer."
-    sleep 0.4
 fi
 
 # --- Check for Python 3.10 ---
@@ -73,12 +68,8 @@ echo "🦈 Installing echosms (system management for sonar ops)..."
 pip install echosms
 
 echo "✅ Python environment $ENV_NAME is fully configured for aquatic signal processing."
-sleep 0.4
 
 # --- Final instructions ---
 echo "📡 AA-SI environment is live and ready for use."
-sleep 0.1
 echo "🔁 Navigate to home directory with: cd"
-sleep 0.1
 echo "🧭 Review transferred files and verify AA-SI readiness. Enter 'aa-help' for a command reference with examples."
-sleep 0.4
