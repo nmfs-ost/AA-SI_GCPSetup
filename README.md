@@ -1,5 +1,8 @@
 # 📘 GCP Workstation : AA-SI Setup Instructions
 
+
+![Step 3 Instructions](assets/instruction_3.png)
+
 This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
 ---
