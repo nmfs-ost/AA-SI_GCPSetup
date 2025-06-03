@@ -3,7 +3,6 @@
 
 ![Step 3 Instructions](assets/instruction_1.png)
 ![Step 3 Instructions](assets/instruction_2.png)
-![Step 3 Instructions](assets/instruction_3.png)
 
 This quick guide walks through preparing the GCP Workstation with AA-SI tools.
 
@@ -26,7 +25,7 @@ gcloud auth application-default login && \
 gcloud config set account {ACCOUNT} && \ 
 gcloud config set project ggn-nmfs-aa-dev-1 
 ```
-
+![Step 3 Instructions](assets/instruction_3.png)
 Follow the browser-based instructions to authenticate using your NOAA Google account.
 
 ---
