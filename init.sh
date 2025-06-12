@@ -24,12 +24,6 @@ else
     echo "🛑 /opt empty — no acoustic data to transfer."
 fi
 
-# --- Install Python 3.10 and venv unconditionally ---
-echo "🔧 Installing Python 3.13 and venv tools..."
-sudo apt update
-sudo apt install -y python3.13-venv
-sudo apt-get install -y python3.13-venv
-
 # --- Set up Python virtual environment and install packages ---
 echo "🔧 Setting up AA-SI environment..."
 cd "$HOME"
@@ -59,3 +53,4 @@ echo "✅ Python environment $ENV_NAME is fully configured for aquatic signal pr
 echo "📡 AA-SI environment is live and ready for use."
 echo "🔁 Navigate to home directory with: cd"
 echo "🧭 Review transferred files and verify AA-SI readiness. Enter 'aa-help' for a command reference with examples."
+sudo apt update
