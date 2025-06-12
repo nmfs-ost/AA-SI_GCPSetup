@@ -8,10 +8,6 @@
 
 4.) Open Terminal :
 
-![Step 3 Instructions](assets/instruction_1.png)
-
-4.) Run command :
-
 ![Step 3 Instructions](assets/instruction_2.png)
 
 This quick guide walks through preparing the GCP Workstation with AA-SI tools.
