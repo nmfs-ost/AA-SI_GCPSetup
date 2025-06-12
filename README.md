@@ -36,6 +36,13 @@ gcloud config set account {ACCOUNT} && \
 gcloud config set project ggn-nmfs-aa-dev-1 
 ```
 ![Step 3 Instructions](assets/instruction_3.png)
+
+You may need to rerun :
+
+```bash
+source aa_si/bin/activate
+```
+
 Follow the browser-based instructions to authenticate using your NOAA Google account.
 
 ---
