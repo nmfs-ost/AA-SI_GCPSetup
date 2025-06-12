@@ -8,6 +8,8 @@
 
 3.) Launch Workstation
 
+![Step 3 Instructions](assets/instruction_5.png)
+
 4.) Open Terminal :
 
 ![Step 3 Instructions](assets/instruction_2.png)
