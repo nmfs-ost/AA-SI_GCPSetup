@@ -25,12 +25,9 @@ else
 fi
 
 # --- Install Python 3.10 and venv unconditionally ---
-echo "🔧 Installing Python 3.10 and venv tools..."
+echo "🔧 Installing Python 3.13 and venv tools..."
 sudo apt update
-sudo apt install -y software-properties-common
-sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo apt update
-sudo apt install -y python3.10 python3.10-dev python3.10-venv
+sudo apt install -y python3.13-venv
 
 # --- Set up Python virtual environment and install packages ---
 echo "🔧 Setting up AA-SI environment..."
