@@ -46,6 +46,14 @@ aa-help
 
 This will list available tools, scripts, or modules you can run within the environment.
 
+
+Download and plot raw file :
+```bash
+aa-raw --file_name "2107RL_CW-D20210813-T220732.raw" --file_type "raw" --ship_name "Reuben_Lasker" --survey_name "RL2107" --echosounder "EK80" --data_source "NCEI" | aa-plot
+
+```
+
+
 ---
 
 # 📜 Disclaimer
