@@ -28,6 +28,7 @@ fi
 echo "🔧 Installing Python 3.13 and venv tools..."
 sudo apt update
 sudo apt install -y python3.13-venv
+sudo apt-get install -y python3.13-venv
 
 # --- Set up Python virtual environment and install packages ---
 echo "🔧 Setting up AA-SI environment..."
