@@ -4,6 +4,7 @@
 
 2.) Create a workstation:
 
+3.) Launch Workstation : 
 ![Step 3 Instructions](assets/instruction_1.png)
 ![Step 3 Instructions](assets/instruction_2.png)
 
