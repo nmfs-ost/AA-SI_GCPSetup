@@ -35,7 +35,7 @@ cd "$HOME"
 
 ENV_NAME="aa_si"
 echo "🧪 Creating virtual environment: $ENV_NAME"
-python3.10 -m venv "$ENV_NAME"
+python3.13 -m venv "$ENV_NAME"
 source "$ENV_NAME/bin/activate"
 
 pip install --upgrade pip
