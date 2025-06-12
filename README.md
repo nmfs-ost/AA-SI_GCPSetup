@@ -3,7 +3,7 @@
 1.) Navigate to https://console.cloud.google.com/workstations/overview
 
 2.) Create a workstation:
-
+![Step 3 Instructions](assets/instruction_4.png)
 3.) Launch Workstation
 
 4.) Open Terminal :
