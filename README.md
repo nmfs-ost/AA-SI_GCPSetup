@@ -4,7 +4,7 @@ This guide provides step-by-step instructions to set up a Google Cloud Platform 
 
 ---
 
-## ➀ Setup Prerequisites
+## ➊ Setup Prerequisites
 
 This setup assumes:
 
@@ -13,7 +13,7 @@ This setup assumes:
 
 ---
 
-## ➁ GCP Workstation Configuration
+## ➋ GCP Workstation Configuration
 
 ### 1. Navigate to GCP Workstations Console
 
@@ -50,7 +50,7 @@ Start a terminal session within your running GCP workstation:
 
 ---
 
-## ➂ Environment Initialization
+## ➌ Environment Initialization
 
 ### 5. Run Initialization Script
 
@@ -94,7 +94,7 @@ Follow browser prompts to authenticate via your NOAA credentials.
 
 ---
 
-## ➃ Using the AA-SI Toolset
+## ➍ Using the AA-SI Toolset
 
 ### 7. View Available Tools
 
@@ -114,6 +114,6 @@ aa-raw --file_name "2107RL_CW-D20210813-T220732.raw" --file_type "raw" --ship_na
 
 ---
 
-## ➄ Disclaimer
+## ➎ Disclaimer
 
 This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or its bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not imply endorsement or favoring by the Department of Commerce. Use of DOC seals or logos shall not suggest endorsement by DOC or the U.S. Government.
