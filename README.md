@@ -7,6 +7,8 @@ This guide provides step-by-step instructions to set up a Google Cloud Platform 
 
 ## 🚀 Step-by-Step Setup Instructions
 
+This setup asdsumes you maintain a NOAA gmail account and you have been authorized to deploy GCP workstations hosted by nmfs - Office of Science and Technology.
+
 ### 1️⃣ Navigate to the GCP Workstations Console  
 Go to:  
 🔗 [https://console.cloud.google.com/workstations/overview](https://console.cloud.google.com/workstations/overview)
