@@ -1,52 +1,62 @@
-
 # 📘 GCP Workstation Setup Guide: **AA-SI Environment**
 
 This guide provides step-by-step instructions to set up a Google Cloud Platform (GCP) Workstation for use with the **AA-SI (Advanced Acoustics - Scientific Integration)** toolset.
 
 ---
 
-## 🚀 Step-by-Step Setup Instructions
+## ➀ Setup Prerequisites
 
-This setup asdsumes you maintain a NOAA gmail account and you have been authorized to deploy GCP workstations hosted by nmfs - Office of Science and Technology.
+This setup assumes:
 
-### 1️⃣ Navigate to the GCP Workstations Console  
-Go to:  
-🔗 [https://console.cloud.google.com/workstations/overview](https://console.cloud.google.com/workstations/overview)
-
----
-
-### 2️⃣ Create a Workstation  
-Use the GCP interface to configure and create your workstation:
-
-![Create Workstation](assets/instruction_4.png)
+1. You maintain a NOAA Gmail account.
+2. You are authorized to deploy GCP Workstations hosted by NMFS - Office of Science and Technology.
 
 ---
 
-### 3️⃣ Launch the Workstation  
-Once created, launch your workstation:
+## ➁ GCP Workstation Configuration
 
-![Launch Workstation](assets/instruction_5.png)
+### 1. Navigate to GCP Workstations Console
 
----
-
-### 4️⃣ Open the Terminal  
-Click to open a terminal session inside the running GCP workstation:
-
-![Open Terminal](assets/instruction_2.png)
+Open your browser and go to: [https://console.cloud.google.com/workstations/overview](https://console.cloud.google.com/workstations/overview)
 
 ---
 
-## ⚙️ Initialization Script
+### 2. Create a Workstation
 
-This command block will:
+Use the interface to configure and deploy a new workstation:
 
-- Download the AA-SI initialization script  
-- Set the appropriate permissions  
-- Execute the script  
-- Activate the Python virtual environment  
+
+
+---
+
+### 3. Launch the Workstation
+
+Once your workstation is created, launch it:
+
+
+
+---
+
+### 4. Open the Terminal
+
+Start a terminal session within your running GCP workstation:
+
+
+
+---
+
+## ➂ Environment Initialization
+
+### 5. Run Initialization Script
+
+This script will:
+
+- Download and run the AA-SI setup script
+- Assign execution permissions
+- Activate the Python virtual environment
 - Start GCP authentication
 
-Paste and run the following in your terminal:
+Paste the following into your terminal:
 
 ```bash
 cd /opt && \
@@ -61,25 +71,29 @@ gcloud config set account {{ACCOUNT}} && \
 gcloud config set project ggn-nmfs-aa-dev-1
 ```
 
-📌 **Note**: Replace `{{ACCOUNT}}` with your NOAA Google account email.
+**Note:** Replace `{{ACCOUNT}}` with your NOAA Google account email.
 
-![Terminal Authentication](assets/instruction_3.png)
 
-If needed later, you can always reactivate the environment using:
+
+---
+
+### 6. Reactivate the Environment Later
+
+You can return to the AA-SI environment at any time by running:
 
 ```bash
 source aa_si/bin/activate
 ```
 
-Follow the browser prompts to authenticate via your NOAA Google credentials.
+Follow browser prompts to authenticate via your NOAA credentials.
 
 ---
 
-## 🐟 Using the AA-SI Environment
+## ➃ Using the AA-SI Toolset
 
-### 🔍 View Available Tools
+### 7. View Available Tools
 
-To see available AA-SI commands and modules, run:
+List available AA-SI commands and modules with:
 
 ```bash
 aa-help
@@ -87,7 +101,7 @@ aa-help
 
 ---
 
-### 📈 Example: Download & Plot Raw File
+### 8. Example Command: Download & Plot Raw File
 
 ```bash
 aa-raw --file_name "2107RL_CW-D20210813-T220732.raw" --file_type "raw" --ship_name "Reuben_Lasker" --survey_name "RL2107" --echosounder "EK80" --data_source "NCEI" | aa-plot
@@ -95,6 +109,6 @@ aa-raw --file_name "2107RL_CW-D20210813-T220732.raw" --file_type "raw" --ship_na
 
 ---
 
-## 📜 Disclaimer
+## ➄ Disclaimer
 
-This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or Department of Commerce bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.
+This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or its bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not imply endorsement or favoring by the Department of Commerce. Use of DOC seals or logos shall not suggest endorsement by DOC or the U.S. Government.
