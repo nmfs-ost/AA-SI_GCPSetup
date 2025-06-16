@@ -90,6 +90,33 @@ You can return to the AA-SI environment at any time by running:
 source aa_si/bin/activate
 ```
 
+### 7. Python Virtual Environments
+
+The startup script automatically creates a Python 3.10 virtual environment named `aa_si`. However, you may want to create additional virtual environments for other Python versions or purposes.
+
+For example, to create environments referencing the Python version, you can use commands like these:
+
+```bash
+# Create a Python 3.10 virtual environment named aa_si10
+python3.10 -m venv aa_si10
+
+# Create a Python 3.11 virtual environment named aa_si11
+python3.11 -m venv aa_si11
+
+# Create a Python 3.12 virtual environment named aa_si12
+python3.12 -m venv aa_si12
+```
+
+To activate these environments:
+
+```bash
+# On Linux/macOS
+source aa_si10/bin/activate
+```
+
+Feel free to use environment names and Python versions that fit your workflow. This allows you to work with multiple Python versions or separate dependencies as needed.
+
+
 Follow browser prompts to authenticate via your NOAA credentials.
 
 ---
