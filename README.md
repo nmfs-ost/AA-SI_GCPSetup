@@ -27,9 +27,14 @@ Use the interface to configure and deploy a new workstation:
 
 ![Create Workstation](assets/instruction_4.png)
 
+### 3. Choose name, display name and jupyter Lab configuration
+
+
+![Create Workstation](assets/instruction_6.png)
+
 ---
 
-### 3. Launch the Workstation
+### 4. Launch the Workstation
 
 Once your workstation is created, launch it:
 
@@ -37,7 +42,7 @@ Once your workstation is created, launch it:
 
 ---
 
-### 4. Open the Terminal
+### 5. Open the Terminal
 
 Start a terminal session within your running GCP workstation:
 
