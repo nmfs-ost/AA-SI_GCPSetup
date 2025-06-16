@@ -25,7 +25,7 @@ Open your browser and go to: [https://console.cloud.google.com/workstations/over
 
 Use the interface to configure and deploy a new workstation:
 
-
+![Create Workstation](assets/instruction_4.png)
 
 ---
 
@@ -33,7 +33,7 @@ Use the interface to configure and deploy a new workstation:
 
 Once your workstation is created, launch it:
 
-
+![Launch Workstation](assets/instruction_5.png)
 
 ---
 
@@ -41,7 +41,7 @@ Once your workstation is created, launch it:
 
 Start a terminal session within your running GCP workstation:
 
-
+![Open Terminal](assets/instruction_2.png)
 
 ---
 
@@ -73,7 +73,7 @@ gcloud config set project ggn-nmfs-aa-dev-1
 
 **Note:** Replace `{{ACCOUNT}}` with your NOAA Google account email.
 
-
+![Terminal Authentication](assets/instruction_3.png)
 
 ---
 
