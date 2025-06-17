@@ -116,14 +116,14 @@ source aa_si10/bin/activate
 
 Feel free to use environment names and Python versions that fit your workflow. This allows you to work with multiple Python versions or separate dependencies as needed.
 
-
-Follow browser prompts to authenticate via your NOAA credentials.
+### 8. Start GCP authentication
+Follow browser prompts to authenticate via your NOAA credentials. A Link will be provided in the terminal and it will carry you throiugh a process of google email based authentication. THis is where your Noaa email account will be required.
 
 ---
 
 ## ➍ Using the AA-SI Toolset
 
-### 7. View Available Tools
+### 1. View Available Tools
 
 List available AA-SI commands and modules with:
 
@@ -133,7 +133,7 @@ aa-help
 
 ---
 
-### 8. Example Command: Download & Plot Raw File
+### 2. Example Command: Download & Plot Raw File
 
 ```bash
 aa-raw --file_name "2107RL_CW-D20210813-T220732.raw" --file_type "raw" --ship_name "Reuben_Lasker" --survey_name "RL2107" --echosounder "EK80" --data_source "NCEI" | aa-plot
