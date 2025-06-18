@@ -9,7 +9,7 @@ This guide provides step-by-step instructions to set up a Google Cloud Platform 
 This setup assumes:
 
 1. You maintain a NOAA Gmail account.
-2. You are authorized to deploy GCP Workstations hosted by NMFS - Office of Science and Technology.
+2. You are authorized to deploy GCP Workstations hosted by NMFS - Office of Science and Technology. If you do not have this set up navigate to : [https://github.com/enterprises/noaa-nmfs](https://github.com/enterprises/noaa-nmfs)
 
 ---
 
