@@ -1,5 +1,9 @@
 # 📘 GCP Workstation Setup Guide: **AA-SI Environment**
 
+<p align="center">
+  <img src="assets/logo.png" alt="Project Logo" width="70%">
+</p>
+
 This guide provides step-by-step instructions to set up a Google Cloud Platform (GCP) Workstation for use with the **AA-SI (Advanced Acoustics - Scientific Integration)** toolset.
 
 ---
