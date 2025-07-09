@@ -49,8 +49,9 @@ echo "🐬 Installing acoustics tools into $ENV_NAME..."
 echo "🎣 Installing AA-SI_aalibrary (active signal interpretation)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_aalibrary
 
-echo "🐡 Installing echoml (echo classification & ML)..."
-pip install --no-cache-dir -vv --force-reinstall git+https://github.com/spacetimeengineer/echoml.git@d4c8bbd
+echo "🐡 Installing AA-SI_KMeans (active acoustics k-means tools)..."
+pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_KMeans.git
+
 
 echo "🦈 Installing echosms (system management for sonar ops)..."
 pip install echosms
