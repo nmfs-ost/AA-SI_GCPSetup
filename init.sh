@@ -30,15 +30,15 @@ sudo apt update
 sudo apt install -y software-properties-common
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt update
-sudo apt install -y python3.10 python3.10-dev python3.10-venv
-
+#sudo apt install -y python3.10 python3.10-dev python3.10-venv
+sudo apt install -y python3.12 python3.12-venv python3.12-dev
 # --- Set up Python virtual environment and install packages ---
 echo "🔧 Setting up AA-SI environment..."
 cd "$HOME"
 
-ENV_NAME="aa_si"
+ENV_NAME="venv3.12"
 echo "🧪 Creating virtual environment: $ENV_NAME"
-python3.10 -m venv "$ENV_NAME"
+python3.12 -m venv "$ENV_NAME"
 source "$ENV_NAME/bin/activate"
 
 pip install --upgrade pip
@@ -49,9 +49,8 @@ echo "🐬 Installing acoustics tools into $ENV_NAME..."
 echo "🎣 Installing AA-SI_aalibrary (active signal interpretation)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_aalibrary
 
-echo "🐡 Installing AA-SI_KMeans (active acoustics k-means tools)..."
-pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_KMeans.git
-
+echo "🐡 Installing echoml (echo classification & ML)..."
+pip install --no-cache-dir -vv --force-reinstall git+https://github.com/spacetimeengineer/echoml.git@d4c8bbd
 
 echo "🦈 Installing echosms (system management for sonar ops)..."
 pip install echosms
