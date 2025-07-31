@@ -68,7 +68,7 @@ This script will:
 Paste the following into your terminal:
 
 ```bash
-cd /opt && \
+cd && \
 sudo rm -f init.sh && \
 sudo wget https://raw.githubusercontent.com/nmfs-ost/AA-SI_GPCSetup/main/init.sh && \
 sudo chmod +x init.sh && \
