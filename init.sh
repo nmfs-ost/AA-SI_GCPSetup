@@ -81,7 +81,7 @@ echo "🎣 Installing AA-SI_aalibrary (active signal interpretation)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_aalibrary
 
 echo "🐡 Installing echoml (echo classification & ML)..."
-pip install --no-cache-dir -vv --force-reinstall git+https://github.com/spacetimeengineer/echoml.git@d4c8bbd
+pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_KMeans
 
 echo "🦈 Installing echosms (system management for sonar ops)..."
 pip install echosms
