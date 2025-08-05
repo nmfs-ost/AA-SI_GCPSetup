@@ -91,7 +91,7 @@ gcloud config set project ggn-nmfs-aa-dev-1
 You can return to the AA-SI environment at any time by running:
 
 ```bash
-source aa_si/bin/activate
+source venv312/bin/activate
 ```
 
 ### 7. Python Virtual Environments
