@@ -74,7 +74,7 @@ sudo wget https://raw.githubusercontent.com/nmfs-ost/AA-SI_GPCSetup/main/init.sh
 sudo chmod +x init.sh && \
 ./init.sh && \
 cd ~ && \
-source aa_si/bin/activate && \
+source venv312/bin/activate && \
 gcloud auth application-default login && \
 gcloud config set account {{ACCOUNT}} && \
 gcloud config set project ggn-nmfs-aa-dev-1
