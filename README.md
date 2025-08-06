@@ -111,18 +111,10 @@ gcloud config set project ggn-nmfs-aa-dev-1
 
 ### 1. View Available Tools
 
-List available AA-SI commands and modules with:
+To explore our suite of functionalities run
 
 ```bash
-aa-help
-```
-
----
-
-### 2. Example Command: Download & Plot Raw File
-
-```bash
-aa-raw --file_name "2107RL_CW-D20210813-T220732.raw" --file_type "raw" --ship_name "Reuben_Lasker" --survey_name "RL2107" --echosounder "EK80" --data_source "NCEI" | aa-plot
+aa-find
 ```
 
 ---
