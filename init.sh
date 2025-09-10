@@ -7,6 +7,7 @@ echo "🔊🐟 Initializing..."
 echo "🏚️ Preparing workstation setup at $HOME..."
 mkdir -p "$HOME"
 echo "🛠️ Base station ($HOME) is operational."
+sudo rm /etc/apt/sources.list.d/helm-stable-debian.list
 sudo apt update
 sudo apt upgrade -y
 
