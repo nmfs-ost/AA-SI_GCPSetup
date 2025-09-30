@@ -9,9 +9,25 @@ mkdir -p "$HOME"
 echo "🛠️ Base station ($HOME) is operational."
 
 
-sudo rm /etc/apt/sources.list.d/helm-stable-debian.list
-curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+BAD_REPO="https://baltocdn.com/helm/stable/debian"
+
+echo "🔎 Checking for bad Helm repo: $BAD_REPO"
+
+FOUND_FILE=$(grep -Rl "$BAD_REPO" /etc/apt/sources.list /etc/apt/sources.list.d/ || true)
+
+if [[ -n "$FOUND_FILE" ]]; then
+    echo "⚠️  Found bad Helm repo in: $FOUND_FILE"
+    echo "🗑️  Removing it..."
+    sudo rm -f "$FOUND_FILE"
+    echo "✅ Removed $FOUND_FILE"
+else
+    echo "✅ No bad Helm repo found."
+fi
+
 
 
 
