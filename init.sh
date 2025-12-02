@@ -98,9 +98,6 @@ fi
 
 pip install --upgrade pip
 
-# Install acoustic processing packages
-echo "🐬 Installing acoustics tools into $ENV_NAME..."
-
 echo "🎣 Installing AA-SI_aalibrary (active signal interpretation)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_aalibrary
 
@@ -109,8 +106,6 @@ pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost
 
 echo "🦈 Installing echosms (system management for sonar ops)..."
 pip install echosms
-
-echo "✅ Python environment $ENV_NAME is fully configured for aquatic signal processing."
 
 # --- Final instructions ---
 echo "📡 AA-SI environment is live and ready for use."
