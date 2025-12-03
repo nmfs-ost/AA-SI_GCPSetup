@@ -36,11 +36,26 @@ sudo apt upgrade -y
 
 
 
-# Check if python3.12 exists
-if command -v python3.12 >/dev/null 2>&1; then
-  echo "✅ Python 3.12 is already installed at: $(command -v python3.12)"
+# Helper: check if python3.12 exists AND has ensurepip
+has_ensurepip() {
+  # Does python3.12 exist?
+  if ! command -v python3.12 >/dev/null 2>&1; then
+    return 1
+  fi
+
+  # Does this python3.12 have ensurepip?
+  if python3.12 -m ensurepip --version >/dev/null 2>&1; then
+    return 0
+  fi
+
+  return 1
+}
+
+# Check for usable python3.12
+if has_ensurepip; then
+  echo "✅ Usable Python 3.12 found at: $(command -v python3.12)"
 else
-  echo "⬇️ Python 3.12 not found. Installing Python 3.12.3 to \$HOME/python312..."
+  echo "⬇️ Python 3.12 (with ensurepip) not found. Installing Python 3.12.3 to \$HOME/python312..."
 
   # Step 1: Install build dependencies
   sudo apt update
@@ -56,10 +71,10 @@ else
   cd Python-3.12.3
 
   # Step 3: Configure with prefix to install in home
-  ./configure --prefix=$HOME/python312 --enable-optimizations
+  ./configure --prefix="$HOME/python312" --enable-optimizations
 
   # Step 4: Build and install
-  make -j$(nproc)
+  make -j"$(nproc)"
   make install
 
   # Step 5: Add to PATH
@@ -70,11 +85,12 @@ fi
 
 # Step 6: Create and activate virtual environment
 if [ ! -d "$HOME/venv312" ]; then
-  python3.12 -m venv ~/venv312
+  python3.12 -m venv "$HOME/venv312"
   echo "✅ Created virtual environment at ~/venv312"
 else
   echo "✅ Virtual environment already exists at ~/venv312"
 fi
+
 
 # Step 7: Activate the virtual environment
 source ~/venv312/bin/activate
