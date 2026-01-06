@@ -123,6 +123,9 @@ pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost
 echo "🦈 Installing echosms (system management for sonar ops)..."
 pip install echosms
 
+pip install ipykernel
+python -m ipykernel install --user --name=venv312 --display-name "venv312"
+
 # --- Final instructions ---
 echo "📡 AA-SI environment is live and ready for use."
 echo "🔁 Navigate to home directory with: cd"
