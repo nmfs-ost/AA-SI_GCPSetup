@@ -113,7 +113,7 @@ else
 fi
 
 pip install --upgrade pip
-
+pip install pyworms matplotlib toml
 echo "🎣 Installing AA-SI_aalibrary (active signal interpretation)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_aalibrary
 
