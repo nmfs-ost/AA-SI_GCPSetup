@@ -121,7 +121,7 @@ echo "🐡 Installing echoml (echo classification & ML)..."
 pip install --no-cache-dir -vv --force-reinstall git+https://github.com/nmfs-ost/AA-SI_KMeans
 
 echo "🦈 Installing echosms (system management for sonar ops)..."
-pip install echosms
+pip install echosms echoregions
 
 pip install ipykernel
 python -m ipykernel install --user --name=venv312 --display-name "venv312"
