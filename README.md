@@ -1,66 +1,101 @@
-# 📘 GCP Workstation Setup Guide: **AA-SI Environment**
-
 <p align="center">
-  <img src="assets/logo.png" alt="Project Logo" width="70%">
+  <img src="assets/logo.png" alt="AA-SI Logo" width="70%">
 </p>
 
-Welcome! 👋 This guide will walk you through setting up a Google Cloud Platform (GCP) Workstation for use with the **AA-SI (Advanced Acoustics – Scientific Integration)** toolset. The steps below are designed to get you up and running quickly, with screenshots along the way.
+<h1 align="center">📘 GCP Workstation Setup Guide</h1>
+<h3 align="center">Advanced Acoustics – Scientific Integration (AA-SI)</h3>
+
+<p align="center">
+  <em>A friendly, step-by-step guide to getting your Google Cloud workstation ready for the AA-SI toolset.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12">
+  <img src="https://img.shields.io/badge/Platform-Google%20Cloud-4285F4?logo=googlecloud&logoColor=white" alt="GCP">
+  <img src="https://img.shields.io/badge/NOAA-NMFS-005EB8" alt="NOAA NMFS">
+</p>
 
 ---
 
-## ➊ Before You Begin
+## 👋 Welcome!
+
+This guide will walk you through setting up a Google Cloud Platform (GCP) Workstation for use with the **AA-SI (Advanced Acoustics – Scientific Integration)** toolset. Whether this is your first cloud environment or just a refresher, you're in the right place — there are screenshots along the way and helpful tips to keep you on track.
+
+---
+
+## 📑 Table of Contents
+
+- [Before You Begin](#-before-you-begin)
+- [GCP Workstation Configuration](#️-gcp-workstation-configuration)
+- [Environment Initialization](#️-environment-initialization)
+- [Using the AA-SI Toolset](#-using-the-aa-si-toolset)
+- [Disclaimer](#-disclaimer)
+
+---
+
+## ✅ Before You Begin
 
 Before starting, please make sure you have:
 
-1. **A NOAA Gmail account** that is active and accessible.
-2. **Authorization to deploy GCP Workstations** hosted by NMFS – Office of Science and Technology.
-   - If you don't yet have this access, please start here: [https://github.com/enterprises/noaa-nmfs](https://github.com/enterprises/noaa-nmfs)
+1. ✉️ **A NOAA Gmail account** that is active and accessible.
+2. 🔐 **Authorization to deploy GCP Workstations** hosted by NMFS – Office of Science and Technology.
+
+> 💡 **Don't have access yet?** No worries — start here: [github.com/enterprises/noaa-nmfs](https://github.com/enterprises/noaa-nmfs)
 
 ---
 
-## ➋ GCP Workstation Configuration
+## ☁️ GCP Workstation Configuration
 
-### 1. Navigate to the GCP Workstations Console
+### Step 1 — Navigate to the GCP Workstations Console
 
-Open your browser and go to: [https://console.cloud.google.com/workstations/overview](https://console.cloud.google.com/workstations/overview)
+Open your browser and head to:
+🔗 [console.cloud.google.com/workstations/overview](https://console.cloud.google.com/workstations/overview)
 
 ---
 
-### 2. Create a Workstation
+### Step 2 — Create a Workstation
 
 Use the interface to configure and deploy a new workstation.
 
-![Create Workstation](assets/instruction_4.png)
+<p align="center">
+  <img src="assets/instruction_4.png" alt="Create Workstation" width="80%">
+</p>
 
 ---
 
-### 3. Choose a Name, Display Name, and JupyterLab Configuration
+### Step 3 — Choose a Name, Display Name, and JupyterLab Configuration
 
 Pick something descriptive so you can easily find your workstation later.
 
-![Create Workstation](assets/instruction_6.png)
+<p align="center">
+  <img src="assets/instruction_6.png" alt="Configure Workstation" width="80%">
+</p>
 
 ---
 
-### 4. Launch the Workstation
+### Step 4 — Launch the Workstation
 
 Once your workstation is created, go ahead and launch it.
 
-![Launch Workstation](assets/instruction_5.png)
+<p align="center">
+  <img src="assets/instruction_5.png" alt="Launch Workstation" width="80%">
+</p>
 
 ---
 
-### 5. Open the Terminal
+### Step 5 — Open the Terminal
 
-Start a terminal session inside your running GCP workstation. This is where the rest of the setup happens.
+Start a terminal session inside your running GCP workstation — this is where the rest of the setup happens.
 
-![Open Terminal](assets/instruction_2.png)
+<p align="center">
+  <img src="assets/instruction_2.png" alt="Open Terminal" width="80%">
+</p>
 
 ---
 
-## ➌ Environment Initialization
+## ⚙️ Environment Initialization
 
-### 1. Run the Initialization Script
+### Step 1 — Run the Initialization Script
 
 This will download and run the AA-SI setup script, set permissions, and activate the Python virtual environment.
 
@@ -80,9 +115,9 @@ source venv312/bin/activate
 
 ---
 
-### 2. Authenticate with GCP
+### Step 2 — Authenticate with GCP
 
-Next, sign in with your NOAA credentials and point gcloud at the AA-SI project:
+Next, sign in with your NOAA credentials and point `gcloud` at the AA-SI project:
 
 ```bash
 gcloud auth application-default login && \
@@ -92,17 +127,19 @@ gcloud config set project ggn-nmfs-aa-dev-1
 
 A link will appear in the terminal — follow it to complete the Google sign-in flow with your NOAA account.
 
-> 📌 **About the placeholders:**
-> - `{{ACCOUNT}}` is typically your NOAA email. If you're unsure or run into trouble with this line, you can also try running just the `gcloud auth application-default login` command on its own — the browser sign-in often handles account selection for you.
+> 📌 **About the placeholders**
+> - `{{ACCOUNT}}` is typically your NOAA email. If you're unsure or run into trouble with this line, try running just the `gcloud auth application-default login` command on its own — the browser sign-in often handles account selection for you.
 > - `ggn-nmfs-aa-dev-1` is the shared AA-SI Project ID. Leave it as written.
 
-If your session ever times out, just run the same commands again to re-authenticate.
+> ⏰ **Session timed out?** Just run the same commands again to re-authenticate.
 
-![Terminal Authentication](assets/instruction_3.png)
+<p align="center">
+  <img src="assets/instruction_3.png" alt="Terminal Authentication" width="80%">
+</p>
 
 ---
 
-### 3. Reactivating the Environment Later
+### Step 3 — Reactivating the Environment Later
 
 Any time you return to your workstation, jump back into the AA-SI environment with:
 
@@ -112,9 +149,9 @@ source venv312/bin/activate
 
 ---
 
-## ➍ Using the AA-SI Toolset
+## 🧰 Using the AA-SI Toolset
 
-### View Available Tools
+### Explore Available Tools
 
 Once your environment is active, you can explore the full suite of AA-SI functionalities by running:
 
@@ -122,10 +159,16 @@ Once your environment is active, you can explore the full suite of AA-SI functio
 aa-find
 ```
 
-That's it — you're ready to start working! 🎉
+🎉 **That's it — you're ready to start working!**
 
 ---
 
-## ➎ Disclaimer
+## 📜 Disclaimer
 
 This repository is a scientific product and is not official communication of the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All NOAA GitHub project code is provided on an 'as is' basis and the user assumes responsibility for its use. Any claims against the Department of Commerce or its bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise does not imply endorsement or favoring by the Department of Commerce. Use of DOC seals or logos shall not suggest endorsement by DOC or the U.S. Government.
+
+---
+
+<p align="center">
+  <em>Made with 🌊 by NOAA NMFS – Office of Science and Technology</em>
+</p>
