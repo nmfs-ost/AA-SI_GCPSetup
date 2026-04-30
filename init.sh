@@ -109,7 +109,20 @@ _styled() {
 
 # ---------------------------------------------------------------------------
 # Live spinner with elapsed time + tail of command output.
+#
+# We draw the spinner ourselves with ANSI escape codes (carriage return +
+# clear-to-end-of-line) instead of using `gum spin`, because gum's
+# --title.file flag isn't available in all versions and we want a single
+# code path that works everywhere gum is present.
 # ---------------------------------------------------------------------------
+
+# Cursor + line-control escapes.
+ESC_HIDE_CURSOR=$'\e[?25l'
+ESC_SHOW_CURSOR=$'\e[?25h'
+ESC_CLEAR_LINE=$'\r\e[2K'
+ESC_DIM=$'\e[2m'
+ESC_CYAN=$'\e[36m'
+ESC_RESET=$'\e[0m'
 
 spin_pretty() {
     local label="$1"; shift
@@ -123,60 +136,77 @@ spin_pretty() {
     local tmpdir
     tmpdir=$(mktemp -d -t aa-spin-XXXXXX)
     local logfile="$tmpdir/log"
-    local statusfile="$tmpdir/status"
 
     : >"$logfile"
-    : >"$statusfile"
 
+    # Run the wrapped command in the background.
     ( "$@" >"$logfile" 2>&1 ) &
     local cmdpid=$!
 
-    (
-        local start now elapsed mins secs tail line term_w max_tail
-        start=$(date +%s)
-        while kill -0 "$cmdpid" 2>/dev/null; do
-            now=$(date +%s)
-            elapsed=$(( now - start ))
-            mins=$(( elapsed / 60 ))
-            secs=$(( elapsed % 60 ))
+    # Make sure we restore the cursor even if the user Ctrl-C's.
+    trap 'printf "%s" "$ESC_SHOW_CURSOR"' INT TERM
+    printf '%s' "$ESC_HIDE_CURSOR"
 
-            term_w=$(tput cols 2>/dev/null || echo 100)
-            max_tail=$(( term_w - ${#label} - 30 ))
-            (( max_tail < 20 )) && max_tail=20
+    # Spinner frames (Braille dots, the same set gum uses).
+    local frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+    local frame_count=${#frames[@]}
 
-            line=""
-            if [[ -s "$logfile" ]]; then
-                line=$(tail -c 4000 "$logfile" 2>/dev/null \
-                    | tr -d '\r' \
-                    | grep -v '^[[:space:]]*$' \
-                    | tail -n 1 \
-                    | tr -dc '[:print:][:space:]' \
-                    | cut -c1-"$max_tail")
-            fi
+    local start now elapsed mins secs frame_idx=0 line term_w max_tail
+    start=$(date +%s)
 
-            if [[ -n "$line" ]]; then
-                printf '%s (%d:%02d)  %s' "$label" "$mins" "$secs" "$line" \
-                    > "$statusfile"
-            else
-                printf '%s (%d:%02d)' "$label" "$mins" "$secs" \
-                    > "$statusfile"
-            fi
-            sleep 1
-        done
-    ) &
-    local tickerpid=$!
+    while kill -0 "$cmdpid" 2>/dev/null; do
+        now=$(date +%s)
+        elapsed=$(( now - start ))
+        mins=$(( elapsed / 60 ))
+        secs=$(( elapsed % 60 ))
 
-    gum spin --spinner dot --show-output \
-        --title.file="$statusfile" \
-        -- bash -c "while kill -0 $cmdpid 2>/dev/null; do sleep 0.5; done" \
-        || true
+        term_w=$(tput cols 2>/dev/null || echo 100)
+        # 4 cols spinner glyph + space, label, " (m:ss)  " ~10 cols, then tail.
+        max_tail=$(( term_w - ${#label} - 18 ))
+        (( max_tail < 20 )) && max_tail=20
 
+        line=""
+        if [[ -s "$logfile" ]]; then
+            line=$(tail -c 4000 "$logfile" 2>/dev/null \
+                | tr -d '\r' \
+                | grep -v '^[[:space:]]*$' \
+                | tail -n 1 \
+                | tr -dc '[:print:][:space:]' \
+                | cut -c1-"$max_tail")
+        fi
+
+        # Compose: clear-line + cyan spinner + label + dim "(m:ss)" + dim tail.
+        if [[ -n "$line" ]]; then
+            printf '%s%s%s%s  %s(%d:%02d)%s  %s%s%s' \
+                "$ESC_CLEAR_LINE" \
+                "$ESC_CYAN" "${frames[$frame_idx]}" "$ESC_RESET" \
+                "$label" \
+                "$ESC_DIM" "$mins" "$secs" "$ESC_RESET" \
+                "$ESC_DIM" "$line" "$ESC_RESET"
+        else
+            printf '%s%s%s%s  %s%s(%d:%02d)%s' \
+                "$ESC_CLEAR_LINE" \
+                "$ESC_CYAN" "${frames[$frame_idx]}" "$ESC_RESET" \
+                "$label" \
+                "$ESC_DIM" "$mins" "$secs" "$ESC_RESET"
+        fi
+
+        frame_idx=$(( (frame_idx + 1) % frame_count ))
+        sleep 0.1
+    done
+
+    # Wait for the command and capture its real exit code.
     wait "$cmdpid"
     local rc=$?
-    kill "$tickerpid" 2>/dev/null || true
-    wait "$tickerpid" 2>/dev/null || true
 
-    if [[ $rc -ne 0 ]]; then
+    # Clear the spinner line, restore cursor, untrap.
+    printf '%s%s' "$ESC_CLEAR_LINE" "$ESC_SHOW_CURSOR"
+    trap - INT TERM
+
+    # Print a final status line so we have a record of what just ran.
+    if [[ $rc -eq 0 ]]; then
+        success "$label"
+    else
         problem "$label didn't complete (exit $rc). Last lines of output:"
         tail -n 30 "$logfile" | sed 's/^/    /' >&2
     fi
