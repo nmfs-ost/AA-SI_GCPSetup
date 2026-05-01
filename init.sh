@@ -176,8 +176,13 @@ spin_pretty() {
         fi
 
         # Compose: clear-line + cyan spinner + label + dim "(m:ss)" + dim tail.
+        # Format must have 12 specifiers to match the 12 args. The previous
+        # version had 11 — missing the %s for the ESC_DIM that wraps the
+        # (m:ss) time — which made printf try to interpret the ESC_DIM
+        # escape sequence as an integer for %d ("printf: : invalid number"),
+        # visible whenever $line was non-empty.
         if [[ -n "$line" ]]; then
-            printf '%s%s%s%s  %s(%d:%02d)%s  %s%s%s' \
+            printf '%s%s%s%s  %s%s(%d:%02d)%s  %s%s%s' \
                 "$ESC_CLEAR_LINE" \
                 "$ESC_CYAN" "${frames[$frame_idx]}" "$ESC_RESET" \
                 "$label" \
