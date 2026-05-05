@@ -108,10 +108,10 @@ sudo wget https://raw.githubusercontent.com/nmfs-ost/AA-SI_GPCSetup/main/init.sh
 sudo chmod +x init.sh && \
 ./init.sh && \
 cd ~ && \
-source venv312/bin/activate
+source venv313/bin/activate
 ```
 
-> 🐍 **Why `venv312`?** Python 3.12 is the version we've standardized on for the AA-SI toolset.
+> 🐍 **Why `venv313`?** Python 3.13 is the version we've standardized on for the AA-SI toolset.
 
 ---
 
@@ -144,7 +144,7 @@ A link will appear in the terminal — follow it to complete the Google sign-in 
 Any time you return to your workstation, jump back into the AA-SI environment with:
 
 ```bash
-source venv312/bin/activate
+source venv313/bin/activate
 ```
 
 ---
