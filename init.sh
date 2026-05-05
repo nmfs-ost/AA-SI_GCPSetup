@@ -53,16 +53,66 @@ fi
 # Helpers.
 # ---------------------------------------------------------------------------
 
+# Generic single-line bordered banner. Kept for any future short-title use.
 banner() {
     if [[ $PLAIN_MODE -eq 1 ]]; then
         printf '\n=== %s ===\n\n' "$1"
         return
     fi
     gum style \
-        --foreground 51 --bold \
-        --border rounded --border-foreground 51 \
+        --foreground 39 --bold \
+        --border rounded --border-foreground 39 \
         --padding "1 4" --margin "1 0" --align center \
         "$1"
+}
+
+# Welcome banner — wider, multi-line, width-aware. Replaces the single-line
+# emoji-driven version, which had two long-running issues:
+#   1) electric-cyan (color 51) is hard to read on light terminals
+#   2) the leading 🐟 / trailing 🌊 glyphs render as tofu boxes on terminals
+#      without an emoji-capable font (common over plain SSH), making the
+#      whole banner look "broken"
+# This version uses a more neutral blue (color 39), a double-line border,
+# and an ASCII-only title with the project description on a second line.
+# It also caps content width so the banner doesn't sprawl on wide terminals
+# and degrades to a centered un-bordered title on narrow ones.
+banner_welcome() {
+    if [[ $PLAIN_MODE -eq 1 ]]; then
+        printf '\n'
+        printf '  ============================================================\n'
+        printf '                       AA-SI WORKSTATION\n'
+        printf '          NOAA Active Acoustics Strategic Initiative\n'
+        printf '  ============================================================\n\n'
+        return
+    fi
+
+    local term_w content_w
+    term_w=$(tput cols 2>/dev/null || echo 80)
+    # Cap at 60 cols so the banner stays readable on ultra-wide terminals;
+    # shrink to fit on narrow ones, leaving a 6-col margin for the border.
+    if (( term_w >= 70 )); then
+        content_w=60
+    else
+        content_w=$(( term_w - 6 ))
+    fi
+    (( content_w < 36 )) && content_w=36
+
+    if (( term_w >= 50 )); then
+        gum style \
+            --align center --bold --foreground 39 \
+            --border double --border-foreground 39 \
+            --padding "1 3" --margin "1 0" \
+            --width "$content_w" \
+            "AA-SI WORKSTATION SETUP" \
+            "" \
+            "NOAA Active Acoustics Strategic Initiative"
+    else
+        # Very narrow terminal — skip the border entirely.
+        gum style --align center --bold --foreground 39 --margin "1 0 0 0" \
+            "AA-SI WORKSTATION SETUP"
+        gum style --align center --foreground 250 --margin "0 0 1 0" \
+            "NOAA Active Acoustics Strategic Initiative"
+    fi
 }
 
 # Multi-line styled paragraph (used for the intro and the closing block).
@@ -225,7 +275,7 @@ spin_pretty() {
 # Onboarding starts here.
 # ===========================================================================
 
-banner "🐟  Welcome to AA-SI  🌊"
+banner_welcome
 
 para \
     "AA-SI is NOAA's Active Acoustics Strategic Initiative — a Python toolkit" \
@@ -432,10 +482,134 @@ spin_pretty "downloading and installing echoml" \
 RESULTS[pkg-echoml]="installed"
 aggregate_prompts_from_repo "https://github.com/nmfs-ost/AA-SI_KMeans" "echoml"
 
+
+# ---------------------------------------------------------------------------
+# 7a. echosms + echoregions.
+#
+# echosms: standard PyPI install, no surprises.
+#
+# echoregions: needs special handling. The 0.2.3 wheel on PyPI has two
+# problems we've hit repeatedly in this environment:
+#
+#   1) The wheel sometimes ships without `_echoregions_version.py`, the
+#      version-stub module that `setuptools-scm` is supposed to generate
+#      at build time. When that file is missing, `import echoregions`
+#      raises ModuleNotFoundError immediately — every aa-* tool that
+#      touches echoregions fails before it can do anything.
+#
+#   2) The 0.2.3 wheel pins `zarr<3` in its metadata. echopype 0.11+
+#      requires `zarr>=3` (uses zarr.codecs.BloscCodec, a zarr-3 API).
+#      pip cannot satisfy both, so `pip install echoregions` will
+#      downgrade zarr and silently break echopype.
+#
+# Both problems are already fixed on the project's `main` branch but no
+# release has been cut yet. So we install from git instead of PyPI:
+# building from a git checkout lets setuptools-scm read tags and emit
+# the version stub correctly, AND we pick up the loosened `zarr<4` pin.
+#
+# If git install fails (network, transient build issue), we fall back
+# to the PyPI wheel and patch around the version-stub bug if it bites.
+# ---------------------------------------------------------------------------
+
 section "Installing echosms and echoregions"
-note "Sister libraries for scattering models and Echoview region handling."
-spin_pretty "installing echosms + echoregions" pip install echosms echoregions
+note "Sister libraries for scattering models (echosms) and Echoview region handling (echoregions). echoregions is installed from its GitHub main branch, not PyPI — see the comment above this section in init.sh for why."
+
+spin_pretty "installing echosms (PyPI)" pip install --no-cache-dir echosms
 RESULTS[pkg-echosms]="installed"
+
+# These are wrapped in functions so spin_pretty can run them as a single
+# command and capture their full output for its tail-of-log display.
+_install_echoregions_from_git() {
+    pip install --no-cache-dir --force-reinstall \
+        "git+https://github.com/OSOceanAcoustics/echoregions.git@main"
+}
+
+_verify_echoregions() {
+    python -c "import echoregions; print('echoregions', echoregions.__version__)"
+}
+
+_write_echoregions_version_stub() {
+    # Last-ditch fix for the missing _echoregions_version.py case.
+    # We only call this if the import is failing for that specific reason.
+    local site_pkgs
+    site_pkgs=$(python -c "import site; print(site.getsitepackages()[0])" 2>/dev/null || true)
+    if [[ -n "$site_pkgs" && -d "$site_pkgs" ]]; then
+        printf 'version = "0.0.0+stub"\n' > "$site_pkgs/_echoregions_version.py"
+        return 0
+    fi
+    return 1
+}
+
+if spin_pretty "installing echoregions (git main)" _install_echoregions_from_git \
+        && spin_pretty "verifying echoregions import" _verify_echoregions; then
+    RESULTS[pkg-echoregions]="installed (git main)"
+else
+    warn "echoregions via git main didn't work cleanly — trying PyPI fallback."
+    if spin_pretty "installing echoregions (PyPI fallback)" \
+            pip install --no-cache-dir --force-reinstall echoregions; then
+        if ! _verify_echoregions >/dev/null 2>&1; then
+            warn "import still failing — writing _echoregions_version stub."
+            _write_echoregions_version_stub || true
+        fi
+        if _verify_echoregions >/dev/null 2>&1; then
+            RESULTS[pkg-echoregions]="installed (PyPI + version stub)"
+        else
+            problem "echoregions cannot be imported. aa-evr will not work until this is fixed manually."
+            RESULTS[pkg-echoregions]="FAILED"
+        fi
+    else
+        problem "echoregions failed to install from both git and PyPI."
+        RESULTS[pkg-echoregions]="FAILED"
+    fi
+fi
+
+
+# ---------------------------------------------------------------------------
+# 7b. Pin zarr to >=3.
+#
+# aalibrary 1.2.0's metadata pins `zarr==2.8.3` (a stale pin from years
+# ago). Depending on install order, pip may honor that pin and downgrade
+# zarr — which immediately breaks echopype 0.11+, since it imports
+# `zarr.codecs.BloscCodec` (a zarr-3 API). Force zarr back to >=3 here,
+# AFTER all the AA-SI packages are installed, so whatever transitive
+# pin tug-of-war happened above is settled in echopype's favor.
+# Pip will print a "dependency conflict" warning about aalibrary's pin;
+# that warning is cosmetic — the code works fine.
+# ---------------------------------------------------------------------------
+
+section "Pinning zarr to a working version"
+note "aalibrary's metadata pins an old zarr; echopype needs zarr>=3. We force zarr>=3 here so echopype imports cleanly. (Pip will warn about the conflict — that warning is cosmetic and safe to ignore.)"
+spin_pretty "ensuring zarr>=3 is installed" \
+    pip install --no-cache-dir --upgrade "zarr>=3,<4"
+RESULTS[zarr-pin]="zarr>=3,<4"
+
+
+# ---------------------------------------------------------------------------
+# 7c. Smoke test: verify the whole stack imports cleanly.
+# ---------------------------------------------------------------------------
+
+section "Verifying the AA-SI Python stack"
+note "Importing every key library in one shot. If this fails, the rest of the script's output will tell you exactly where to look."
+
+_verify_stack() {
+    python - <<'PY'
+import sys
+mods = ["echopype", "echoregions", "zarr", "aalibrary"]
+versions = {}
+for m in mods:
+    mod = __import__(m)
+    versions[m] = getattr(mod, "__version__", "?")
+for m, v in versions.items():
+    print(f"  {m:<14} {v}")
+PY
+}
+
+if spin_pretty "importing echopype, echoregions, zarr, aalibrary" _verify_stack; then
+    RESULTS[stack-verified]="all imports OK"
+else
+    problem "Stack verification failed. Check the error above; aa-* tools may not run until it's fixed."
+    RESULTS[stack-verified]="FAILED"
+fi
 
 
 # ---------------------------------------------------------------------------
@@ -653,11 +827,11 @@ if [[ $PLAIN_MODE -eq 0 ]]; then
         "----------------------" "------------------------------" \
         "$summary_rows")
 
-    gum style --border rounded --border-foreground 51 --padding "1 2" \
+    gum style --border rounded --border-foreground 39 --padding "1 2" \
         --margin "2 0 1 0" --foreground 252 \
         "$summary"
 
-    gum style --bold --foreground 51 --margin "1 0" "🎣  You're all set"
+    gum style --bold --foreground 39 --margin "1 0" "You're all set."
     gum style --foreground 252 --margin "0 0 0 2" \
         "Your AA-SI environment is installed and ready. Here's what to do first:" \
         "" \
