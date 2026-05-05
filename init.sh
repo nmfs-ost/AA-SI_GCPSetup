@@ -474,13 +474,13 @@ spin_pretty "downloading and installing aalibrary" \
 RESULTS[pkg-aalibrary]="installed"
 aggregate_prompts_from_repo "https://github.com/nmfs-ost/AA-SI_aalibrary" "aalibrary"
 
-section "Installing echoml"
+section "Installing AA-SI_KMeans"
 note "K-means and ML utilities for echo classification."
-spin_pretty "downloading and installing echoml" \
+spin_pretty "downloading and installing AA-SI_KMeans" \
     pip install --no-cache-dir --force-reinstall \
         git+https://github.com/nmfs-ost/AA-SI_KMeans
 RESULTS[pkg-echoml]="installed"
-aggregate_prompts_from_repo "https://github.com/nmfs-ost/AA-SI_KMeans" "echoml"
+aggregate_prompts_from_repo "https://github.com/nmfs-ost/AA-SI_KMeans" "AA-SI_KMeans"
 
 
 # ---------------------------------------------------------------------------
