@@ -4,9 +4,6 @@
 # Idempotent and safe to re-run, but designed for a first-time user: the
 # voice walks you through what's being set up and why, sets expectations
 # for how long things take, and ends with a clear "what to try first."
-#
-# This variant assumes the base image already has Python 3.13 installed
-# and creates the venv at ~/venv313.
 
 set -euo pipefail
 
@@ -285,10 +282,10 @@ para \
     "for processing fisheries acoustic data (Sv, TS, MVBS, NASC) from Simrad" \
     "EK60 / EK80 echosounders." \
     "" \
-    "This script gets your workstation ready: it installs the AA-SI tools" \
-    "and the in-terminal assistant 'aa-help'. Most of it runs unattended." \
+    "This script gets your workstation ready: it installs Python, the AA-SI" \
+    "tools, and the in-terminal assistant 'aa-help'. Most of it runs unattended." \
     "" \
-    "Total time: about 2–4 minutes on a fresh GCP image, faster on re-run." \
+    "Total time: about 5–10 minutes on a fresh GCP image, faster on re-run." \
     "If a step looks slow, check the line below the spinner — it shows live" \
     "progress so you'll know nothing is hung."
 
@@ -329,32 +326,60 @@ RESULTS[system-packages]="up to date"
 
 
 # ---------------------------------------------------------------------------
-# 3. Python 3.13 (image-provided).
-#
-# This image ships with Python 3.13 already installed, so we just verify
-# it's present and usable. If `python3.13` isn't on PATH for some reason,
-# we bail loudly rather than silently falling back to a different Python
-# — the AA-SI stack is pinned to 3.13 in this script.
+# 3. Python 3.12 (build from source if not already present).
 # ---------------------------------------------------------------------------
 
-section "Verifying Python 3.13 is available"
-note "AA-SI tools target Python 3.13. This image ships with it pre-installed; we just confirm it's usable."
+section "Setting up Python 3.12"
+note "AA-SI tools target Python 3.12. We use the system one if it's there, otherwise build it from source into your home directory."
 
-if ! command -v python3.13 >/dev/null 2>&1; then
-    problem "python3.13 not found on PATH."
-    problem "This script expects an image with Python 3.13 already installed."
-    problem "If you're on a different image, install Python 3.13 first or use the build-from-source variant of init.sh."
-    exit 1
+has_ensurepip() {
+    command -v python3.12 >/dev/null 2>&1 \
+        && python3.12 -m ensurepip --version >/dev/null 2>&1
+}
+
+if has_ensurepip; then
+    success "Python 3.12 is already installed at $(command -v python3.12)."
+    RESULTS[python]="system"
+elif [[ -x "$HOME/python312/bin/python3.12" ]]; then
+    success "found a previously-built Python 3.12 in your home directory."
+    export PATH="$HOME/python312/bin:$PATH"
+    if ! grep -q 'HOME/python312/bin' "$HOME/.bashrc" 2>/dev/null; then
+        echo 'export PATH="$HOME/python312/bin:$PATH"' >> "$HOME/.bashrc"
+    fi
+    RESULTS[python]="reusing prebuilt"
+else
+    note "Building from source. This is the slow step — about 3–5 minutes. Coffee break time."
+    spin_pretty "installing build tools" \
+        sudo apt-get install -y -qq build-essential libssl-dev zlib1g-dev \
+            libncurses5-dev libncursesw5-dev libreadline-dev libsqlite3-dev \
+            libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev \
+            tk-dev uuid-dev libffi-dev wget
+
+    BUILD_DIR=$(mktemp -d -t py312-build-XXXXXX)
+    trap 'rm -rf "$BUILD_DIR"' EXIT
+    pushd "$BUILD_DIR" >/dev/null
+
+    spin_pretty "downloading Python 3.12.3" \
+        wget https://www.python.org/ftp/python/3.12.3/Python-3.12.3.tgz
+    spin_pretty "unpacking the source tarball" tar -xzf Python-3.12.3.tgz
+    cd Python-3.12.3
+    spin_pretty "configuring the build" \
+        ./configure --prefix="$HOME/python312" --enable-optimizations
+    spin_pretty "compiling Python — the longest step, hang tight" \
+        make -j"$(nproc)"
+    spin_pretty "installing into ~/python312" make install
+
+    popd >/dev/null
+    rm -rf "$BUILD_DIR"
+    trap - EXIT
+
+    if ! grep -q 'HOME/python312/bin' "$HOME/.bashrc" 2>/dev/null; then
+        echo 'export PATH="$HOME/python312/bin:$PATH"' >> "$HOME/.bashrc"
+    fi
+    export PATH="$HOME/python312/bin:$PATH"
+    success "Python 3.12.3 ready in ~/python312."
+    RESULTS[python]="built from source"
 fi
-
-if ! python3.13 -m ensurepip --version >/dev/null 2>&1; then
-    problem "python3.13 was found at $(command -v python3.13) but 'ensurepip' isn't available."
-    problem "The system Python 3.13 looks incomplete; install python3.13-venv (Debian/Ubuntu) and re-run."
-    exit 1
-fi
-
-success "Python 3.13 is ready at $(command -v python3.13) ($(python3.13 --version))."
-RESULTS[python]="system (pre-installed)"
 
 
 # ---------------------------------------------------------------------------
@@ -362,18 +387,18 @@ RESULTS[python]="system (pre-installed)"
 # ---------------------------------------------------------------------------
 
 section "Creating your AA-SI virtual environment"
-note "Everything AA-SI installs lives in ~/venv313, isolated from system Python. The venv auto-activates from your shell once setup is done."
+note "Everything AA-SI installs lives in ~/venv312, isolated from system Python. The venv auto-activates from your shell once setup is done."
 
-if [[ ! -d "$HOME/venv313" ]]; then
-    spin_pretty "creating the venv" python3.13 -m venv "$HOME/venv313"
+if [[ ! -d "$HOME/venv312" ]]; then
+    spin_pretty "creating the venv" python3.12 -m venv "$HOME/venv312"
     RESULTS[venv]="created"
 else
-    success "~/venv313 already exists — reusing it."
+    success "~/venv312 already exists — reusing it."
     RESULTS[venv]="reused"
 fi
 
 # shellcheck disable=SC1091
-source "$HOME/venv313/bin/activate"
+source "$HOME/venv312/bin/activate"
 success "venv active. You're now using $(python --version)."
 
 
@@ -592,11 +617,11 @@ fi
 # ---------------------------------------------------------------------------
 
 section "Adding a Jupyter kernel for this venv"
-note "This makes 'venv313' selectable as a kernel inside Jupyter / VS Code notebooks."
+note "This makes 'venv312' selectable as a kernel inside Jupyter / VS Code notebooks."
 
 spin_pretty "installing ipykernel" pip install ipykernel
-spin_pretty "registering the venv313 kernel" \
-    python -m ipykernel install --user --name=venv313 --display-name "venv313"
+spin_pretty "registering the venv312 kernel" \
+    python -m ipykernel install --user --name=venv312 --display-name "venv312"
 RESULTS[jupyter-kernel]="registered"
 
 
@@ -620,7 +645,7 @@ RESULTS[jupyter-kernel]="registered"
 #
 # These live under ~/.ipython/profile_default/startup/ which IPython
 # loads automatically at the start of every kernel — so they apply to
-# the venv313 kernel registered above and to any other kernel the user
+# the venv312 kernel registered above and to any other kernel the user
 # adds later.
 # ---------------------------------------------------------------------------
 
