@@ -588,38 +588,6 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 7d. Fetch a sample raw acoustic data file.
-#
-# Now that aalibrary (and therefore the `aa-raw` command) is installed and
-# importable, pull down a known-good EK60 .raw file from the Henry B.
-# Bigelow HB0905 survey. This gives the user something concrete to point
-# the rest of the aa-* tools at without hunting for sample data.
-#
-# Best-effort: if `aa-raw` fails (network, NCEI hiccup, auth not yet
-# configured for this fetch path) we warn and continue rather than
-# aborting setup — `set -e` is intentionally bypassed via `|| true`.
-# ---------------------------------------------------------------------------
-
-section "Fetching a sample EK60 .raw file"
-note "Pulls one file from the Bigelow HB0905 survey via 'aa-raw' so you have real data to try the tools against. Best-effort — a failure here won't stop setup."
-
-_fetch_sample_raw() {
-    aa-raw --file_name D20090916-T132105.raw \
-           --ship_name Henry_B._Bigelow \
-           --survey_name HB0905 \
-           --sonar_model EK60 \
-           --file_download_directory Henry_B._Bigelow_HB0905_EK60_NCEI
-}
-
-if spin_pretty "downloading D20090916-T132105.raw via aa-raw" _fetch_sample_raw; then
-    RESULTS[sample-raw]="downloaded"
-else
-    warn "couldn't fetch the sample .raw file. You can re-run the aa-raw command after authenticating: 'gcloud auth application-default login'."
-    RESULTS[sample-raw]="skipped (will retry post-auth)"
-fi
-
-
-# ---------------------------------------------------------------------------
 # 8. Jupyter kernel.
 # ---------------------------------------------------------------------------
 
@@ -855,7 +823,55 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 11. Closing block.
+# 11. Authenticate with GCP and fetch a sample raw acoustic data file.
+#
+# The aa-raw fetch path reads from a Google Cloud bucket, so it needs
+# Application Default Credentials in place before it can talk to NCEI.
+# We run `gcloud auth application-default login` here — interactively;
+# it will print a URL for the user to visit and paste a verification
+# code back. Once that returns, we pull a known-good EK60 .raw file
+# from the Henry B. Bigelow HB0905 survey so the user has real data to
+# point the rest of the aa-* tools at.
+#
+# Both steps are best-effort: if auth or the fetch fails (user aborted,
+# network, NCEI hiccup) we warn and continue rather than aborting the
+# whole setup. `|| true` keeps `set -e` from killing us.
+# ---------------------------------------------------------------------------
+
+section "Authenticating with GCP"
+note "'gcloud auth application-default login' opens an auth flow in your browser (or prints a URL to visit). Sign in with your Google account so 'aa-raw' and 'aa-help' can read from GCP. This is interactive — follow the prompts."
+
+# Don't wrap this in spin_pretty: the command is interactive and prints
+# a URL the user has to visit. Capturing its output would hide that.
+if gcloud auth application-default login; then
+    success "GCP application-default credentials are in place."
+    RESULTS[gcp-auth]="authenticated"
+else
+    warn "auth didn't complete cleanly. You can re-run 'gcloud auth application-default login' yourself later; aa-raw and aa-help will fail until you do."
+    RESULTS[gcp-auth]="skipped"
+fi
+
+section "Fetching a sample EK60 .raw file"
+note "Pulls one file from the Bigelow HB0905 survey via 'aa-raw' so you have real data to try the tools against. Best-effort — a failure here won't stop setup."
+
+_fetch_sample_raw() {
+    aa-raw --file_name D20090916-T132105.raw \
+           --ship_name Henry_B._Bigelow \
+           --survey_name HB0905 \
+           --sonar_model EK60 \
+           --file_download_directory Henry_B._Bigelow_HB0905_EK60_NCEI
+}
+
+if spin_pretty "downloading D20090916-T132105.raw via aa-raw" _fetch_sample_raw; then
+    RESULTS[sample-raw]="downloaded"
+else
+    warn "couldn't fetch the sample .raw file. Verify auth ('gcloud auth application-default login') then re-run the aa-raw command from the script."
+    RESULTS[sample-raw]="failed"
+fi
+
+
+# ---------------------------------------------------------------------------
+# 12. Closing block.
 # ===========================================================================
 
 if [[ $PLAIN_MODE -eq 0 ]]; then
@@ -876,9 +892,10 @@ if [[ $PLAIN_MODE -eq 0 ]]; then
         "Your AA-SI environment is installed and ready. Here's what to do first:" \
         "" \
         "  1.  cd ~                                        # drop into your home dir" \
-        "  2.  gcloud auth application-default login       # sign in to GCP for aa-help" \
-        "  3.  aa-help --reindex                           # build the local knowledge DB (one-time)" \
-        "  4.  aa-help \"what does aa-mvbs do?\"             # try it" \
+        "  2.  aa-help --reindex                           # build the local knowledge DB (one-time)" \
+        "  3.  aa-help \"what does aa-mvbs do?\"             # try it" \
+        "" \
+        "(GCP auth was completed earlier — re-run 'gcloud auth application-default login' if you ever need to refresh it.)" \
         "" \
         "Day-to-day, you'll mostly use 'aa-help' for guidance and the 'aa-*'" \
         "commands for actual data processing. 'aa-help --help' lists everything." \
@@ -903,9 +920,11 @@ else
 You're all set. Here's what to do first:
 
   1.  cd ~                                        # drop into your home dir
-  2.  gcloud auth application-default login       # sign in to GCP for aa-help
-  3.  aa-help --reindex                           # build the local knowledge DB
-  4.  aa-help "what does aa-mvbs do?"             # try it
+  2.  aa-help --reindex                           # build the local knowledge DB
+  3.  aa-help "what does aa-mvbs do?"             # try it
+
+(GCP auth was completed earlier — re-run 'gcloud auth application-default login'
+if you ever need to refresh it.)
 
 Day-to-day, you'll mostly use 'aa-help' for guidance and the 'aa-*' commands
 for actual data processing. 'aa-help --help' lists everything.
@@ -922,4 +941,25 @@ Repo prompts cache:   $REPO_PROMPTS_DIR
 aa-help config:       $AA_HELP_CONFIG
 IPython startup:      $IPYTHON_STARTUP_DIR
 EOF
+fi
+
+
+# ---------------------------------------------------------------------------
+# 13. Self-delete.
+#
+# Setup is one-shot — re-running it is a footgun (it would re-prompt for
+# auth and re-download the sample .raw file). With `set -e` in effect,
+# we only get here when every preceding step succeeded, so it's safe to
+# remove ourselves now. If the script was piped from stdin (e.g.
+# `curl ... | bash`) BASH_SOURCE[0] won't be a real file and the -f
+# guard makes this a no-op.
+# ---------------------------------------------------------------------------
+
+SCRIPT_PATH="${BASH_SOURCE[0]:-$0}"
+if [[ -f "$SCRIPT_PATH" ]]; then
+    if rm -f -- "$SCRIPT_PATH" 2>/dev/null; then
+        info "removed $SCRIPT_PATH (one-shot setup is complete)."
+    else
+        warn "couldn't remove $SCRIPT_PATH — you can delete it manually."
+    fi
 fi
