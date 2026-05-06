@@ -634,6 +634,36 @@ fi
 
 
 # ---------------------------------------------------------------------------
+# 8b. Fetch the sample region.evr file.
+#
+# An Echoview region-definition file from AA-SI_GCPSetup that pairs
+# with the sample .raw we fetch later — gives users a working region
+# to feed into aa-evr without having to draw their own. Same approach
+# as the Examples notebook above: pull from raw.githubusercontent.com
+# (the blob/ URL would return HTML, not the file), drop in $HOME,
+# best-effort on failure.
+# ---------------------------------------------------------------------------
+
+section "Fetching the sample region.evr file"
+note "Drops region.evr (an Echoview region definition from AA-SI_GCPSetup) into your home directory so you have a working input ready for 'aa-evr'."
+
+REGION_EVR_URL="https://raw.githubusercontent.com/nmfs-ost/AA-SI_GCPSetup/main/region.evr"
+REGION_EVR_PATH="$HOME/region.evr"
+
+_fetch_region_evr() {
+    curl -fsSL --connect-timeout 10 "$REGION_EVR_URL" -o "$REGION_EVR_PATH"
+}
+
+if spin_pretty "downloading region.evr to $REGION_EVR_PATH" _fetch_region_evr; then
+    success "region.evr is at $REGION_EVR_PATH"
+    RESULTS[region-evr]="downloaded"
+else
+    warn "couldn't download region.evr. You can fetch it manually from $REGION_EVR_URL"
+    RESULTS[region-evr]="skipped (network)"
+fi
+
+
+# ---------------------------------------------------------------------------
 # 9. Jupyter ↔ aa-* startup glue.
 #
 # Two tiny IPython startup files so the aa-* tools work cleanly inside
@@ -823,36 +853,28 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 11. Authenticate with GCP and fetch a sample raw acoustic data file.
+# 11. Fetch a sample raw acoustic data file.
 #
-# The aa-raw fetch path reads from a Google Cloud bucket, so it needs
-# Application Default Credentials in place before it can talk to NCEI.
-# We run `gcloud auth application-default login` here — interactively;
-# it will print a URL for the user to visit and paste a verification
-# code back. Once that returns, we pull a known-good EK60 .raw file
-# from the Henry B. Bigelow HB0905 survey so the user has real data to
-# point the rest of the aa-* tools at.
+# Run this almost last so any auth-related failure surfaces only after
+# every other step has finished — nothing earlier needs GCP creds, so
+# there's no reason to gate the whole script on an interactive login.
 #
-# Both steps are best-effort: if auth or the fetch fails (user aborted,
-# network, NCEI hiccup) we warn and continue rather than aborting the
-# whole setup. `|| true` keeps `set -e` from killing us.
+# aa-raw reads from a Google Cloud bucket, which needs Application
+# Default Credentials. On the GCP images this script is meant for,
+# ADC are already provisioned from the image itself, so this step is
+# non-interactive and just works. We deliberately do NOT call
+# `gcloud auth application-default login` preemptively — on those
+# images it would trigger a redundant interactive flow for no benefit,
+# and on images where it IS needed, the user only needs to run it once
+# (the credentials persist), so we'd rather they discover that via a
+# clear failure message here than be prompted up front every time.
+#
+# Best-effort: a failure here won't stop setup. The if/else handles
+# the non-zero exit cleanly under `set -e`.
 # ---------------------------------------------------------------------------
 
-section "Authenticating with GCP"
-note "'gcloud auth application-default login' opens an auth flow in your browser (or prints a URL to visit). Sign in with your Google account so 'aa-raw' and 'aa-help' can read from GCP. This is interactive — follow the prompts."
-
-# Don't wrap this in spin_pretty: the command is interactive and prints
-# a URL the user has to visit. Capturing its output would hide that.
-if gcloud auth application-default login; then
-    success "GCP application-default credentials are in place."
-    RESULTS[gcp-auth]="authenticated"
-else
-    warn "auth didn't complete cleanly. You can re-run 'gcloud auth application-default login' yourself later; aa-raw and aa-help will fail until you do."
-    RESULTS[gcp-auth]="skipped"
-fi
-
 section "Fetching a sample EK60 .raw file"
-note "Pulls one file from the Bigelow HB0905 survey via 'aa-raw' so you have real data to try the tools against. Best-effort — a failure here won't stop setup."
+note "Pulls one file from the Bigelow HB0905 survey via 'aa-raw' so you have real data to try the tools against. Uses your existing GCP credentials — no separate login step. Best-effort: a failure here won't stop setup."
 
 _fetch_sample_raw() {
     aa-raw --file_name D20090916-T132105.raw \
@@ -865,7 +887,7 @@ _fetch_sample_raw() {
 if spin_pretty "downloading D20090916-T132105.raw via aa-raw" _fetch_sample_raw; then
     RESULTS[sample-raw]="downloaded"
 else
-    warn "couldn't fetch the sample .raw file. Verify auth ('gcloud auth application-default login') then re-run the aa-raw command from the script."
+    warn "couldn't fetch the sample .raw file. If the error above mentions credentials, ADC, or auth, run 'gcloud auth application-default login' once and then re-run the aa-raw command from this section of the script."
     RESULTS[sample-raw]="failed"
 fi
 
@@ -895,7 +917,7 @@ if [[ $PLAIN_MODE -eq 0 ]]; then
         "  2.  aa-help --reindex                           # build the local knowledge DB (one-time)" \
         "  3.  aa-help \"what does aa-mvbs do?\"             # try it" \
         "" \
-        "(GCP auth was completed earlier — re-run 'gcloud auth application-default login' if you ever need to refresh it.)" \
+        "(GCP credentials are read from your environment. If aa-raw or aa-help complain about auth, run 'gcloud auth application-default login' once.)" \
         "" \
         "Day-to-day, you'll mostly use 'aa-help' for guidance and the 'aa-*'" \
         "commands for actual data processing. 'aa-help --help' lists everything." \
@@ -923,8 +945,8 @@ You're all set. Here's what to do first:
   2.  aa-help --reindex                           # build the local knowledge DB
   3.  aa-help "what does aa-mvbs do?"             # try it
 
-(GCP auth was completed earlier — re-run 'gcloud auth application-default login'
-if you ever need to refresh it.)
+(GCP credentials are read from your environment. If aa-raw or aa-help
+complain about auth, run 'gcloud auth application-default login' once.)
 
 Day-to-day, you'll mostly use 'aa-help' for guidance and the 'aa-*' commands
 for actual data processing. 'aa-help --help' lists everything.
