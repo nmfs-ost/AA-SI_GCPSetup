@@ -588,6 +588,38 @@ fi
 
 
 # ---------------------------------------------------------------------------
+# 7d. Fetch a sample raw acoustic data file.
+#
+# Now that aalibrary (and therefore the `aa-raw` command) is installed and
+# importable, pull down a known-good EK60 .raw file from the Henry B.
+# Bigelow HB0905 survey. This gives the user something concrete to point
+# the rest of the aa-* tools at without hunting for sample data.
+#
+# Best-effort: if `aa-raw` fails (network, NCEI hiccup, auth not yet
+# configured for this fetch path) we warn and continue rather than
+# aborting setup — `set -e` is intentionally bypassed via `|| true`.
+# ---------------------------------------------------------------------------
+
+section "Fetching a sample EK60 .raw file"
+note "Pulls one file from the Bigelow HB0905 survey via 'aa-raw' so you have real data to try the tools against. Best-effort — a failure here won't stop setup."
+
+_fetch_sample_raw() {
+    aa-raw --file_name D20090916-T132105.raw \
+           --ship_name Henry_B._Bigelow \
+           --survey_name HB0905 \
+           --sonar_model EK60 \
+           --file_download_directory Henry_B._Bigelow_HB0905_EK60_NCEI
+}
+
+if spin_pretty "downloading D20090916-T132105.raw via aa-raw" _fetch_sample_raw; then
+    RESULTS[sample-raw]="downloaded"
+else
+    warn "couldn't fetch the sample .raw file. You can re-run the aa-raw command after authenticating: 'gcloud auth application-default login'."
+    RESULTS[sample-raw]="skipped (will retry post-auth)"
+fi
+
+
+# ---------------------------------------------------------------------------
 # 8. Jupyter kernel.
 # ---------------------------------------------------------------------------
 
@@ -598,6 +630,39 @@ spin_pretty "installing ipykernel" pip install ipykernel
 spin_pretty "registering the venv313 kernel" \
     python -m ipykernel install --user --name=venv313 --display-name "venv313"
 RESULTS[jupyter-kernel]="registered"
+
+
+# ---------------------------------------------------------------------------
+# 8a. Fetch the Examples notebook.
+#
+# A worked-examples notebook from AA-SI_GCPSetup that walks through the
+# tools we just installed. Dropped in $HOME so it shows up at the top of
+# the file tree the first time the user opens Jupyter / VS Code, with no
+# digging required.
+#
+# We pull the *raw* GitHub URL (raw.githubusercontent.com), not the
+# blob/main page — the blob URL returns HTML, which would save a useless
+# webpage instead of the notebook JSON. Best-effort: a network failure
+# warns and continues instead of aborting setup.
+# ---------------------------------------------------------------------------
+
+section "Fetching the Examples notebook"
+note "Drops Examples.ipynb (from AA-SI_GCPSetup) into your home directory so you have a worked walkthrough of the aa-* tools ready to open in Jupyter."
+
+EXAMPLES_NB_URL="https://raw.githubusercontent.com/nmfs-ost/AA-SI_GCPSetup/main/Examples.ipynb"
+EXAMPLES_NB_PATH="$HOME/Examples.ipynb"
+
+_fetch_examples_notebook() {
+    curl -fsSL --connect-timeout 10 "$EXAMPLES_NB_URL" -o "$EXAMPLES_NB_PATH"
+}
+
+if spin_pretty "downloading Examples.ipynb to $EXAMPLES_NB_PATH" _fetch_examples_notebook; then
+    success "Examples.ipynb is at $EXAMPLES_NB_PATH"
+    RESULTS[examples-notebook]="downloaded"
+else
+    warn "couldn't download Examples.ipynb. You can fetch it manually from $EXAMPLES_NB_URL"
+    RESULTS[examples-notebook]="skipped (network)"
+fi
 
 
 # ---------------------------------------------------------------------------
