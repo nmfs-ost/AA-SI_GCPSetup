@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.12">
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python 3.13">
   <img src="https://img.shields.io/badge/Platform-Google%20Cloud-4285F4?logo=googlecloud&logoColor=white" alt="GCP">
   <img src="https://img.shields.io/badge/NOAA-NMFS-005EB8" alt="NOAA NMFS">
 </p>
