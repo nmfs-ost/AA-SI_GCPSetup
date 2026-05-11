@@ -122,14 +122,14 @@ Next, sign in with your NOAA credentials and point `gcloud` at the AA-SI project
 ```bash
 gcloud auth application-default login && \
 gcloud config set account {{ACCOUNT}} && \
-gcloud config set project ggn-nmfs-aa-dev-1
+gcloud config set project ggn-nmfs-wsent-prod-1
 ```
 
 A link will appear in the terminal — follow it to complete the Google sign-in flow with your NOAA account.
 
 > 📌 **About the placeholders**
 > - `{{ACCOUNT}}` is typically your NOAA email. If you're unsure or run into trouble with this line, try running just the `gcloud auth application-default login` command on its own — the browser sign-in often handles account selection for you.
-> - `ggn-nmfs-aa-dev-1` is the shared AA-SI Project ID. Leave it as written.
+> - `ggn-nmfs-wsent-prod-1` is the shared AA-SI Project ID. Leave it as written.
 
 > ⏰ **Session timed out?** Just run the same commands again to re-authenticate.
 
