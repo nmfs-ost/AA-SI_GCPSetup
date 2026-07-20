@@ -853,7 +853,80 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 11. Fetch a sample raw acoustic data file.
+# 11. AA-SI Workbench (browser-based workspace).
+#
+# The Workbench drives the same aa-* tools installed above — it is an
+# orchestrator, not a separate stack — so it must live in THIS venv, where
+# aalibrary is importable.
+#
+# Two things make this step unlike the pip installs above:
+#
+#   1) It is installed EDITABLE (-e) from a clone we keep at
+#      ~/AA-SI_Workbench. The launcher finds the compiled UI by walking up
+#      from the installed package to a directory holding both frontend/ and
+#      backend/. A regular install lands in site-packages, finds no such
+#      siblings, and cannot serve the UI. The clone has to stay put.
+#
+#   2) The browser UI is TypeScript that npm/Vite compiles once into three
+#      static files. Node is needed ONLY for that build, never at runtime —
+#      at runtime it is a single Python process serving those files next to
+#      /api on one port. We build here so the first launch is instant and a
+#      build failure surfaces during setup rather than in front of a user.
+#      If Node is unavailable we skip it; `aa-workbench` builds on first
+#      launch instead.
+# ---------------------------------------------------------------------------
+
+section "Installing the AA-SI Workbench"
+note "A browser-based workspace for the aa-* tools: browse NCEI surveys, assemble processing pipelines, and view results. It installs into this venv and pre-compiles its UI so the first launch is instant."
+
+WORKBENCH_DIR="$HOME/AA-SI_Workbench"
+WORKBENCH_REPO="https://github.com/nmfs-ost/AA-SI_Workbench"
+
+_clone_or_update_workbench() {
+    if [[ -d "$WORKBENCH_DIR/.git" ]]; then
+        git -C "$WORKBENCH_DIR" pull --ff-only
+    else
+        git clone "$WORKBENCH_REPO" "$WORKBENCH_DIR"
+    fi
+}
+
+_install_workbench() {
+    pip install --no-cache-dir -e "$WORKBENCH_DIR/backend"
+}
+
+if spin_pretty "fetching the Workbench source" _clone_or_update_workbench \
+        && spin_pretty "installing the Workbench into venv313" _install_workbench; then
+    RESULTS[workbench]="installed"
+
+    # Compile the browser UI. Build-time only — nothing below runs again
+    # when the user launches the Workbench.
+    if ! command -v npm >/dev/null 2>&1; then
+        note "Node.js isn't present. It's needed once to compile the UI (never to run it), so we'll try to install it."
+        spin_pretty "installing Node.js (one-time, build only)" \
+            sudo apt-get install -y -qq nodejs npm || true
+    fi
+
+    if command -v npm >/dev/null 2>&1; then
+        if spin_pretty "compiling the Workbench UI (1-2 min, one-time)" aa-workbench build; then
+            RESULTS[workbench-ui]="pre-built"
+        else
+            warn "the UI didn't compile. 'aa-workbench' will retry the build on first launch."
+            RESULTS[workbench-ui]="deferred to first launch"
+        fi
+    else
+        warn "no Node.js available — skipping the UI build. 'aa-workbench' will build it on first launch (needs Node 18+)."
+        RESULTS[workbench-ui]="deferred to first launch"
+    fi
+
+    aggregate_prompts_from_repo "$WORKBENCH_REPO" "AA-SI_Workbench"
+else
+    problem "the Workbench didn't install. Your aa-* command-line tools are unaffected."
+    RESULTS[workbench]="FAILED"
+fi
+
+
+# ---------------------------------------------------------------------------
+# 12. Fetch a sample raw acoustic data file.
 #
 # Run this almost last so any auth-related failure surfaces only after
 # every other step has finished — nothing earlier needs GCP creds, so
@@ -893,7 +966,7 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 12. Closing block.
+# 13. Closing block.
 # ===========================================================================
 
 if [[ $PLAIN_MODE -eq 0 ]]; then
@@ -916,6 +989,7 @@ if [[ $PLAIN_MODE -eq 0 ]]; then
         "  1.  cd ~                                        # drop into your home dir" \
         "  2.  aa-help --reindex                           # build the local knowledge DB (one-time)" \
         "  3.  aa-help \"what does aa-mvbs do?\"             # try it" \
+        "  4.  aa-workbench --open                         # open the browser workspace" \
         "" \
         "(GCP credentials are read from your environment. If aa-raw or aa-help complain about auth, run 'gcloud auth application-default login' once.)" \
         "" \
@@ -928,6 +1002,7 @@ if [[ $PLAIN_MODE -eq 0 ]]; then
         "" \
         "(Both the PATH fix and the 'aa_show' helper are pre-installed — no setup cells needed.)"
     gum style --foreground 245 --margin "1 0" \
+        "Workbench source:     $WORKBENCH_DIR" \
         "Knowledge directory:  $AA_DOCS_HOME" \
         "Repo prompts cache:   $REPO_PROMPTS_DIR" \
         "aa-help config:       $AA_HELP_CONFIG" \
@@ -944,6 +1019,7 @@ You're all set. Here's what to do first:
   1.  cd ~                                        # drop into your home dir
   2.  aa-help --reindex                           # build the local knowledge DB
   3.  aa-help "what does aa-mvbs do?"             # try it
+  4.  aa-workbench --open                         # open the browser workspace
 
 (GCP credentials are read from your environment. If aa-raw or aa-help
 complain about auth, run 'gcloud auth application-default login' once.)
@@ -958,6 +1034,7 @@ In Jupyter / VS Code notebooks, render any pipeline's output inline with:
 (Both the PATH fix and the 'aa_show' helper are pre-installed — no setup
 cells needed.)
 
+Workbench source:     $WORKBENCH_DIR
 Knowledge directory:  $AA_DOCS_HOME
 Repo prompts cache:   $REPO_PROMPTS_DIR
 aa-help config:       $AA_HELP_CONFIG
@@ -967,7 +1044,7 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# 13. Self-delete.
+# 14. Self-delete.
 #
 # Setup is one-shot — re-running it is a footgun (it would re-prompt for
 # auth and re-download the sample .raw file). With `set -e` in effect,
