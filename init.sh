@@ -859,7 +859,7 @@ fi
 # orchestrator, not a separate stack — so it must live in THIS venv, where
 # aalibrary is importable.
 #
-# Two things make this step unlike the pip installs above:
+# Three things make this step unlike the pip installs above:
 #
 #   1) It is installed EDITABLE (-e) from a clone we keep at
 #      ~/AA-SI_Workbench. The launcher finds the compiled UI by walking up
@@ -867,7 +867,15 @@ fi
 #      backend/. A regular install lands in site-packages, finds no such
 #      siblings, and cannot serve the UI. The clone has to stay put.
 #
-#   2) The browser UI is TypeScript that npm/Vite compiles once into three
+#   2) It is installed with --no-deps. Steps 7-7b already installed
+#      numpy/xarray/echopype/boto3 and settled the zarr pin against
+#      aalibrary's stale zarr==2.8.3. Handing pip that same conflict again
+#      makes its resolver backtrack through echopype releases for tens of
+#      minutes, and on Python 3.13 it can land on a version with no wheel and
+#      start compiling from source. So we install the package alone and then
+#      add only the web dependencies the Workbench introduces on top.
+#
+#   3) The browser UI is TypeScript that npm/Vite compiles once into three
 #      static files. Node is needed ONLY for that build, never at runtime —
 #      at runtime it is a single Python process serving those files next to
 #      /api on one port. We build here so the first launch is instant and a
@@ -877,12 +885,19 @@ fi
 # ---------------------------------------------------------------------------
 
 section "Installing the AA-SI Workbench"
-note "A browser-based workspace for the aa-* tools: browse NCEI surveys, assemble processing pipelines, and view results. It installs into this venv and pre-compiles its UI so the first launch is instant."
+note "A browser-based workspace for the aa-* tools: browse NCEI surveys, assemble processing pipelines, and view results. It installs into this venv and pre-compiles its UI (about 2 minutes) so the first launch is instant."
 
 WORKBENCH_DIR="$HOME/AA-SI_Workbench"
 WORKBENCH_REPO="https://github.com/nmfs-ost/AA-SI_Workbench"
 
 _clone_or_update_workbench() {
+    # Never let git block on a credential prompt. spin_pretty redirects output
+    # to a log file, so an interactive "Username for https://github.com:"
+    # prompt is invisible AND unanswerable — setup would hang forever on a
+    # private or missing repo. These two make git fail fast instead, so the
+    # error below actually reaches the user.
+    export GIT_TERMINAL_PROMPT=0
+    export GIT_ASKPASS=/bin/true
     if [[ -d "$WORKBENCH_DIR/.git" ]]; then
         git -C "$WORKBENCH_DIR" pull --ff-only
     else
@@ -891,11 +906,18 @@ _clone_or_update_workbench() {
 }
 
 _install_workbench() {
-    pip install --no-cache-dir -e "$WORKBENCH_DIR/backend"
+    pip install --no-cache-dir --no-deps -e "$WORKBENCH_DIR/backend"
+    pip install --no-cache-dir \
+        "fastapi>=0.110" "uvicorn[standard]>=0.29" "pydantic>=2.6" "boto3>=1.34"
+}
+
+_verify_workbench() {
+    python -c "import aa_si_workbench, aa_si_workbench.api.main; print('workbench', aa_si_workbench.__version__)"
 }
 
 if spin_pretty "fetching the Workbench source" _clone_or_update_workbench \
-        && spin_pretty "installing the Workbench into venv313" _install_workbench; then
+        && spin_pretty "installing the Workbench into venv313" _install_workbench \
+        && spin_pretty "verifying the Workbench imports" _verify_workbench; then
     RESULTS[workbench]="installed"
 
     # Compile the browser UI. Build-time only — nothing below runs again
@@ -917,10 +939,8 @@ if spin_pretty "fetching the Workbench source" _clone_or_update_workbench \
         warn "no Node.js available — skipping the UI build. 'aa-workbench' will build it on first launch (needs Node 18+)."
         RESULTS[workbench-ui]="deferred to first launch"
     fi
-
-    aggregate_prompts_from_repo "$WORKBENCH_REPO" "AA-SI_Workbench"
 else
-    problem "the Workbench didn't install. Your aa-* command-line tools are unaffected."
+    problem "the Workbench didn't install. If the clone failed, check that $WORKBENCH_REPO is reachable from this machine — a private repo needs 'gh auth login' here first. Your aa-* command-line tools are unaffected."
     RESULTS[workbench]="FAILED"
 fi
 
