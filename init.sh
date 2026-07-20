@@ -898,17 +898,36 @@ _clone_or_update_workbench() {
     # error below actually reaches the user.
     export GIT_TERMINAL_PROMPT=0
     export GIT_ASKPASS=/bin/true
+
     if [[ -d "$WORKBENCH_DIR/.git" ]]; then
-        git -C "$WORKBENCH_DIR" pull --ff-only
-    else
-        git clone "$WORKBENCH_REPO" "$WORKBENCH_DIR"
+        # --ff-only refuses to invent a merge, which is right — but it also
+        # fails hard when the remote history was rewritten (force-push, repo
+        # recreated). A checkout we cloned ourselves has nothing worth
+        # preserving, so re-clone rather than leave the user stuck.
+        if git -C "$WORKBENCH_DIR" pull --ff-only; then
+            return 0
+        fi
+        echo "pull failed (history rewritten?) — re-cloning"
+        rm -rf "$WORKBENCH_DIR"
+    fi
+    git clone "$WORKBENCH_REPO" "$WORKBENCH_DIR" || return 1
+
+    # The repo must have backend/ at its root. If someone published the parent
+    # folder by mistake, everything downstream fails in confusing ways.
+    if [[ ! -f "$WORKBENCH_DIR/backend/pyproject.toml" ]]; then
+        echo "clone has no backend/pyproject.toml at its root:"
+        ls -1 "$WORKBENCH_DIR" | head
+        return 1
     fi
 }
 
 _install_workbench() {
-    pip install --no-cache-dir --no-deps -e "$WORKBENCH_DIR/backend"
-    pip install --no-cache-dir \
-        "fastapi>=0.110" "uvicorn[standard]>=0.29" "pydantic>=2.6" "boto3>=1.34"
+    # `&&`, not two statements: a shell function returns the exit code of its
+    # LAST command, so without this a failed editable install is masked by the
+    # dependency install succeeding — and the step reports a green tick.
+    pip install --no-cache-dir --no-deps -e "$WORKBENCH_DIR/backend" \
+        && pip install --no-cache-dir \
+            "fastapi>=0.110" "uvicorn[standard]>=0.29" "pydantic>=2.6" "boto3>=1.34"
 }
 
 _verify_workbench() {
