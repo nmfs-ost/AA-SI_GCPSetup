@@ -873,7 +873,9 @@ fi
 #      makes its resolver backtrack through echopype releases for tens of
 #      minutes, and on Python 3.13 it can land on a version with no wheel and
 #      start compiling from source. So we install the package alone and then
-#      add only the web dependencies the Workbench introduces on top.
+#      add only the web dependencies the Workbench introduces on top
+#      (plus google-cloud-storage, which the Derived panel needs to list the
+#      derived-assets bucket).
 #
 #   3) The browser UI is TypeScript that npm/Vite compiles once into three
 #      static files. Node is needed ONLY for that build, never at runtime —
@@ -927,7 +929,8 @@ _install_workbench() {
     # dependency install succeeding — and the step reports a green tick.
     pip install --no-cache-dir --no-deps -e "$WORKBENCH_DIR/backend" \
         && pip install --no-cache-dir \
-            "fastapi>=0.110" "uvicorn[standard]>=0.29" "pydantic>=2.6" "boto3>=1.34"
+            "fastapi>=0.110" "uvicorn[standard]>=0.29" "pydantic>=2.6" \
+            "boto3>=1.34" "google-cloud-storage>=2.14"
 }
 
 _verify_workbench() {
